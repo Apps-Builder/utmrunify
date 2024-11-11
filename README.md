@@ -1,6 +1,6 @@
-# utmrunify
+# flutter_application_1
 
-UTM Running Application
+A new Flutter project.
 
 ## Getting Started
 
