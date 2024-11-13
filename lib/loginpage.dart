@@ -119,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
                         // Handle login logic here
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.red, // Button color
+                        backgroundColor: Colors.red, // Button color
                         padding: EdgeInsets.symmetric(vertical: 15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
