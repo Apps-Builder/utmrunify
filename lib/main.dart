@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:utmrunify/loginpage.dart';
 import 'event_details.dart';
 import 'track_distance.dart';
 
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 128, 0, 53)),
         useMaterial3: true,
       ),
-      home: const MyHomePage(),
+      home: LoginPage(),
     );
   }
 }

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'organiserloginpage.dart';
+import 'loginpage.dart';
+import 'organisersignuppage.dart';
 
-class LoginPage extends StatefulWidget {
+class OrganiserLoginPage extends StatefulWidget {
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _OrganiserLoginPageState createState() => _OrganiserLoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
 
   @override
   void initState() {
@@ -27,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(
-                    'assets/image/background.png'), // Replace with your image path
+                    'lib/assets/background.png'), // Replace with your image path
                 fit: BoxFit.cover,
                 alignment: Alignment.centerLeft,
               ),
@@ -75,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
-                      hintText: 'UTMID',
+                      hintText: 'E-mail',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15.0),
                       ),
@@ -99,20 +100,40 @@ class _LoginPageState extends State<LoginPage> {
                       EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                     ),
                   ),
-                  SizedBox(height: 15),
+                  SizedBox(height: 10),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
                         PageRouteBuilder(
-                          pageBuilder: (context, animation, secondaryAnimation) => OrganiserLoginPage(),
+                          pageBuilder: (context, animation, secondaryAnimation) => OrganiserSignUpPage(),
                           transitionDuration: Duration.zero, // Removes the transition duration
                           reverseTransitionDuration: Duration.zero, // Removes reverse transition
                         ),
                       );
                     },
                     child: Text(
-                      "Login as Organiser",
+                      "Sign Up as Organiser",
+                      style: TextStyle(
+                        color: Colors.white,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation, secondaryAnimation) => LoginPage(),
+                          transitionDuration: Duration.zero, // Removes the transition duration
+                          reverseTransitionDuration: Duration.zero, // Removes reverse transition
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "User Login",
                       style: TextStyle(
                         color: Colors.white,
                         decoration: TextDecoration.underline,
