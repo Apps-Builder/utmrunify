@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'loginpage.dart';
+import 'main.dart';
 import 'organisersignuppage.dart';
 
 class OrganiserLoginPage extends StatefulWidget {
@@ -20,6 +21,7 @@ class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Color.fromRGBO(246, 247, 252, 1),
       body: Stack(
         children: [
@@ -28,7 +30,7 @@ class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(
-                    'lib/assets/background.png'), // Replace with your image path
+                    'assets/image/background.png'), // Replace with your image path
                 fit: BoxFit.cover,
                 alignment: Alignment.centerLeft,
               ),
@@ -117,6 +119,7 @@ class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
                       style: TextStyle(
                         color: Colors.white,
                         decoration: TextDecoration.underline,
+                        decorationColor: Colors.white,
                       ),
                     ),
                   ),
@@ -137,6 +140,7 @@ class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
                       style: TextStyle(
                         color: Colors.white,
                         decoration: TextDecoration.underline,
+                        decorationColor: Colors.white,
                       ),
                     ),
                   ),
@@ -147,7 +151,14 @@ class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
                     width: double.infinity, // Full width button
                     child: ElevatedButton(
                       onPressed: () {
-                        // Handle login logic here
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
+                            transitionDuration: Duration.zero, // Removes the transition duration
+                            reverseTransitionDuration: Duration.zero, // Removes reverse transition
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF870C14), // Button color
@@ -162,6 +173,7 @@ class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+
                         ),
                       ),
                     ),

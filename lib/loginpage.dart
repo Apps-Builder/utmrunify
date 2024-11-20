@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'main.dart';
 import 'organiserloginpage.dart';
 
 class LoginPage extends StatefulWidget {
@@ -18,7 +19,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Color.fromRGBO(246, 247, 252, 1),
       body: Stack(
         children: [
@@ -116,6 +119,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(
                         color: Colors.white,
                         decoration: TextDecoration.underline,
+                        decorationColor: Colors.white,
                       ),
                     ),
                   ),
@@ -126,7 +130,14 @@ class _LoginPageState extends State<LoginPage> {
                     width: double.infinity, // Full width button
                     child: ElevatedButton(
                       onPressed: () {
-                        // Handle login logic here
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
+                            transitionDuration: Duration.zero, // Removes the transition duration
+                            reverseTransitionDuration: Duration.zero, // Removes reverse transition
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF870C14), // Button color
@@ -141,6 +152,7 @@ class _LoginPageState extends State<LoginPage> {
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          decorationColor: Colors.white,
                         ),
                       ),
                     ),

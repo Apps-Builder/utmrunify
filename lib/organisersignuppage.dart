@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:utmrunify/main.dart';
 
 import 'organiserloginpage.dart';
 
@@ -24,7 +25,9 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
     bool _isChecked = false;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
+
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -190,7 +193,16 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
                   Container(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _onSignUp,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
+                            transitionDuration: Duration.zero, // Removes the transition duration
+                            reverseTransitionDuration: Duration.zero, // Removes reverse transition
+                          ),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF870C14), // Button color
                         padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -200,7 +212,12 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
                         ),
                       ),
 
-                      child: Text("Sign Up"),
+                      child: Text(
+                        "Sign Up",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ],
