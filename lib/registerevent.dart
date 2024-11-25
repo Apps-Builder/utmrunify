@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'participants_details.dart';
+import 'main.dart';
 
 class RunSelectionPage extends StatefulWidget {
-  const RunSelectionPage({super.key});
+  final RunningEvent selectedEvent;
+
+  const RunSelectionPage({super.key, required this.selectedEvent});
 
   @override
   _RunSelectionPageState createState() => _RunSelectionPageState();
@@ -11,21 +15,44 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
   bool is5kmSelected = true;
   bool is10kmSelected = false;
   String selectedSize = 'Size';
+  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
+    final entitlements = is5kmSelected
+        ? [
+            '1. 5KM UNBOCS\'24 finisher jersey',
+            '2. 5KM finisher medal',
+            '3. 5KM race bib',
+            '4. E-certificate',
+            '5. Refreshments',
+          ]
+        : [
+            '1. 10KM UNBOCS\'24 finisher jersey',
+            '2. 10KM finisher medal',
+            '3. 10KM race bib',
+            '4. E-certificate',
+            '5. Refreshments',
+          ];
+
+    final subtotal = is5kmSelected ? 'RM45.00' : 'RM60.00';
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+          tooltip: 'Back',
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('UNBOCS\'24 RUN'),
+        title: Text(widget.selectedEvent.name),
         actions: [
           IconButton(
             icon: const Icon(Icons.shopping_cart),
+            tooltip: 'Cart',
             onPressed: () {
-              // Handle cart action here
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Cart functionality coming soon!')),
+              );
             },
           ),
         ],
@@ -39,25 +66,59 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
               'Choose a category',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            CheckboxListTile(
-              title: const Text('5KM'),
-              value: is5kmSelected,
-              onChanged: (value) {
+            const SizedBox(height: 8),
+            // Interactive Selection for 5KM
+            GestureDetector(
+              onTap: () {
                 setState(() {
-                  is5kmSelected = value!;
-                  if (value) is10kmSelected = false;
+                  is5kmSelected = true;
+                  is10kmSelected = false;
                 });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('5KM selected')),
+                );
               },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: is5kmSelected
+                      ? const Color.fromARGB(255, 119, 0, 50)
+                      : Colors.grey[300],
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: const Text(
+                  '5KM',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
             ),
-            CheckboxListTile(
-              title: const Text('10KM'),
-              value: is10kmSelected,
-              onChanged: (value) {
+            const SizedBox(height: 8),
+            // Interactive Selection for 10KM
+            GestureDetector(
+              onTap: () {
                 setState(() {
-                  is10kmSelected = value!;
-                  if (value) is5kmSelected = false;
+                  is5kmSelected = false;
+                  is10kmSelected = true;
                 });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('10KM selected')),
+                );
               },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: is10kmSelected
+                      ? const Color.fromARGB(255, 119, 0, 50)
+                      : Colors.grey[300],
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: const Text(
+                  '10KM',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -65,45 +126,77 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Text('1. 5KM UNBOCS\'24 finisher jersey'),
-            const SizedBox(height: 8),
+            ...entitlements.map((item) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Text(item),
+                )),
+            const SizedBox(height: 16),
             DropdownButton<String>(
               value: selectedSize,
               items: <String>['Size', 'XS', 'S', 'M', 'L', 'XL', 'XXL']
                   .map((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.checkroom),
+                      const SizedBox(width: 8.0),
+                      Text(value),
+                    ],
+                  ),
                 );
               }).toList(),
               onChanged: (String? newValue) {
                 setState(() {
                   selectedSize = newValue!;
                 });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Selected size: $selectedSize')),
+                );
               },
               style: const TextStyle(fontSize: 16, color: Colors.black),
               isExpanded: true,
             ),
-            const SizedBox(height: 16),
-            const Text('2. 5KM finisher medal'),
-            const Text('3. 5KM race bib'),
-            const Text('4. E-certificate'),
-            const Text('5. Refreshments'),
             const Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Subtotal RM45.00',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Text(
+                  'Subtotal $subtotal',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Handle submit action here
+                    String selectedCategory =
+                        is5kmSelected ? '5KM run' : '10KM run';
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            ParticipantFormPage(
+                          category: selectedCategory,
+                          selectedEvent: widget.selectedEvent,
+                        ),
+                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                          const begin = Offset(1.0, 0.0);
+                          const end = Offset.zero;
+                          const curve = Curves.easeInOut;
+
+                          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                          var offsetAnimation = animation.drive(tween);
+
+                          return SlideTransition(
+                            position: offsetAnimation,
+                            child: child,
+                          );
+                        },
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    backgroundColor: const Color.fromARGB(255, 119, 0, 50),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
                   ),
                   child: const Text('SUBMIT'),
                 ),
@@ -113,16 +206,44 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Selected: ${_getNavLabel(index)}')),
+          );
+        },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
-          BottomNavigationBarItem(icon: Icon(Icons.fiber_manual_record), label: 'Record'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.notifications), label: 'Notifications'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.fiber_manual_record), label: 'Record'),
           BottomNavigationBarItem(icon: Icon(Icons.shopping_bag), label: 'Shop'),
           BottomNavigationBarItem(icon: Icon(Icons.directions_run), label: 'Activity'),
         ],
-        selectedItemColor: Colors.red,
+        selectedItemColor: const Color.fromARGB(255, 119, 0, 50),
         unselectedItemColor: Colors.black,
       ),
     );
+  }
+
+  String _getNavLabel(int index) {
+    switch (index) {
+      case 0:
+        return 'Home';
+      case 1:
+        return 'Notifications';
+      case 2:
+        return 'Record';
+      case 3:
+        return 'Shop';
+      case 4:
+        return 'Activity';
+      default:
+        return '';
+    }
   }
 }
