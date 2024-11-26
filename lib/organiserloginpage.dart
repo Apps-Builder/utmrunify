@@ -13,9 +13,19 @@ class OrganiserLoginPage extends StatefulWidget {
 
 class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
 
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _email.dispose();
+    _password.dispose();
   }
 
   @override
@@ -85,6 +95,7 @@ class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
                       contentPadding:
                       EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                     ),
+                    controller: _email,
                   ),
                   SizedBox(height: 15), // Spacing between fields
 
@@ -101,6 +112,7 @@ class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
                       contentPadding:
                       EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                     ),
+                    controller: _password,
                   ),
                   SizedBox(height: 10),
                   GestureDetector(
