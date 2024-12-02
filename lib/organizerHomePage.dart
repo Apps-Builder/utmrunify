@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'addevent.dart';
 
-
-
-class MyApp extends StatelessWidget {
+class OrganizerHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,15 +20,12 @@ class HomePage extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.person),
-            onPressed: () {
-              
-            },
+            onPressed: () {},
           ),
         ],
       ),
       body: ListView(
         children: [
-          
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -41,15 +36,13 @@ class HomePage extends StatelessWidget {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 TextButton(
-                  onPressed: () {
-                    
-                  },
+                  onPressed: () {},
                   child: Text('See More >'),
                 ),
               ],
             ),
           ),
-       
+
           Container(
             height: 200,
             child: ListView(
@@ -89,16 +82,12 @@ class HomePage extends StatelessWidget {
                 FeatureButton(
                   icon: Icons.people,
                   label: 'Participants',
-                  onPressed: () {
-              
-                  },
+                  onPressed: () {},
                 ),
                 FeatureButton(
                   icon: Icons.event,
                   label: 'Manage Event',
-                  onPressed: () {
-                 
-                  },
+                  onPressed: () {},
                 ),
                 FeatureButton(
                   icon: Icons.add_circle,
@@ -106,16 +95,15 @@ class HomePage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => RegisterEventPage()), 
+                      MaterialPageRoute(
+                          builder: (context) => RegisterEventPage()),
                     );
                   },
                 ),
                 FeatureButton(
                   icon: Icons.bar_chart,
                   label: 'Report',
-                  onPressed: () {
-                   
-                  },
+                  onPressed: () {},
                 ),
               ],
             ),
