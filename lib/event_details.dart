@@ -85,7 +85,7 @@ class EventDetailsPage extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const RunSelectionPage()),
+                    MaterialPageRoute(builder: (context) => RunSelectionPage(selectedEvent: event)),
                   );
                 },
                 style: ElevatedButton.styleFrom(
