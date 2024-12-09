@@ -1,9 +1,13 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:utmrunify/loginpage.dart';
+import 'auth_service.dart';
 import 'event_details.dart';
 import 'track_distance.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Add this line
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -34,12 +38,12 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
   static final List<Widget> _pages = <Widget>[
-    const HomePage(),
-    const NotificationPage(),
-    const RecordPage(),
-    const ShopPage(),
-    const ActivityPage(),
-    const ProfilePage(),
+    HomePage(),
+    NotificationPage(),
+    RecordPage(),
+    ShopPage(),
+    ActivityPage(),
+    ProfilePage(),
   ];
 
   void _onItemTapped(int index) {
@@ -60,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const ProfilePage()),
+              MaterialPageRoute(builder: (context) => ProfilePage()),
             );
           },
         ),
@@ -270,8 +274,8 @@ class ActivityPage extends StatelessWidget {
 }
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-
+  ProfilePage({super.key});
+  final _auth = AuthService();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -289,9 +293,42 @@ class ProfilePage extends StatelessWidget {
                 labelText: 'Enter your username',
               ),
             ),
+            Container(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  await _auth.signout();
+                  goToLogin(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF870C14), // Button color
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  textStyle: TextStyle(fontSize: 18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20), // Rounded corners
+                  ),
+                ),
+
+                child: Text(
+                  "Sign Out",
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
+goToLogin(BuildContext context) => Navigator.push(
+  context,
+  PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => LoginPage(),
+    transitionDuration: Duration.zero, // Removes the transition duration
+    reverseTransitionDuration: Duration.zero, // Removes reverse transition
+  ),
+);

@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:utmrunify/main.dart';
 
+import 'auth_service.dart';
 import 'organiserloginpage.dart';
 
 class OrganiserSignUpPage extends StatefulWidget {
@@ -12,13 +15,31 @@ class OrganiserSignUpPage extends StatefulWidget {
 
 class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
 
+  final _auth = AuthService();
+
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+  final _contactno = TextEditingController();
+  final _confirmpassword = TextEditingController();
+
   @override
   void initState() {
     super.initState();
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _email.dispose();
+    _password.dispose();
+    _contactno.dispose();
+    _confirmpassword.dispose();
+  }
+
   void _onSignUp() {
 
   }
+
   @override
   Widget build(BuildContext context) {
 
@@ -111,6 +132,7 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
                             labelStyle: TextStyle(color: Colors.black),
 
                           ),
+                          controller: _email,
                           cursorColor: Colors.black,
                           keyboardType: TextInputType.emailAddress,
                         ),
@@ -127,6 +149,7 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
                             labelStyle: TextStyle(color: Colors.black),
 
                           ),
+                          controller: _contactno,
                           cursorColor: Colors.black,
                           keyboardType: TextInputType.phone,
                         ),
@@ -144,6 +167,7 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
                             labelStyle: TextStyle(color: Colors.black),
 
                           ),
+                          controller: _password,
                           cursorColor: Colors.black,
                         ),
                         SizedBox(height: 16.0),
@@ -160,6 +184,7 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
                             labelStyle: TextStyle(color: Colors.black),
 
                           ),
+                          controller: _confirmpassword,
                           cursorColor: Colors.black,
                         ),
                       ],
@@ -193,16 +218,7 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
                   Container(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
-                            transitionDuration: Duration.zero, // Removes the transition duration
-                            reverseTransitionDuration: Duration.zero, // Removes reverse transition
-                          ),
-                        );
-                      },
+                      onPressed: _signup,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF870C14), // Button color
                         padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -228,5 +244,22 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
         ),
       ),
     );
+  }
+
+  goToHome(BuildContext context) => Navigator.push(
+    context,
+    PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
+      transitionDuration: Duration.zero, // Removes the transition duration
+      reverseTransitionDuration: Duration.zero, // Removes reverse transition
+    ),
+  );
+
+  _signup() async {
+    final user = await _auth.createUserWithEmailAndPassword(_email.text, _password.text);
+    if (user != null) {
+      log("User created successfully");
+      goToHome(context);
+    }
   }
 }

@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'auth_service.dart';
 import 'main.dart';
 import 'organiserloginpage.dart';
 
@@ -12,9 +15,20 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
 
+  final _auth = AuthService();
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _email.dispose();
+    _password.dispose();
   }
 
   @override
@@ -78,13 +92,14 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
-                      hintText: 'UTMID',
+                      hintText: 'UTM Email',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15.0),
                       ),
                       contentPadding:
                       EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                     ),
+                    controller: _email,
                   ),
                   SizedBox(height: 15), // Spacing between fields
 
@@ -101,6 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                       contentPadding:
                       EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                     ),
+                    controller: _password,
                   ),
                   SizedBox(height: 15),
                   GestureDetector(
@@ -129,15 +145,8 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(
                     width: double.infinity, // Full width button
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
-                            transitionDuration: Duration.zero, // Removes the transition duration
-                            reverseTransitionDuration: Duration.zero, // Removes reverse transition
-                          ),
-                        );
+                      onPressed: () async {
+                        _login();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF870C14), // Button color
@@ -164,5 +173,23 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
     );
+
   }
+  goToHome(BuildContext context) => Navigator.push(
+    context,
+    PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
+      transitionDuration: Duration.zero, // Removes the transition duration
+      reverseTransitionDuration: Duration.zero, // Removes reverse transition
+    ),
+  );
+
+  _login() async {
+    final user = await _auth.loginUserWithEmailAndPassword(_email.text, _password.text);
+    if (user != null) {
+      log("User logged in successfully");
+      goToHome(context);
+    }
+  }
+
 }
