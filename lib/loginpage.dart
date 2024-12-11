@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:utmrunify/usersignuppage.dart';
 
 import 'auth_service.dart';
 import 'main.dart';
@@ -92,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
-                      hintText: 'UTM Email',
+                      hintText: 'E-mail',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15.0),
                       ),
@@ -117,6 +118,27 @@ class _LoginPageState extends State<LoginPage> {
                       EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                     ),
                     controller: _password,
+                  ),
+                  SizedBox(height: 10),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation, secondaryAnimation) => UserSignUpPage(),
+                          transitionDuration: Duration.zero, // Removes the transition duration
+                          reverseTransitionDuration: Duration.zero, // Removes reverse transition
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "Sign Up as User",
+                      style: TextStyle(
+                        color: Colors.white,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.white,
+                      ),
+                    ),
                   ),
                   SizedBox(height: 15),
                   GestureDetector(

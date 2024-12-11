@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:utmrunify/organizerHomePage.dart';
 
 import 'loginpage.dart';
 import 'main.dart';
 import 'organisersignuppage.dart';
-import 'organizerHomePage.dart';
 
 class OrganiserLoginPage extends StatefulWidget {
+
   @override
   _OrganiserLoginPageState createState() => _OrganiserLoginPageState();
 }
@@ -53,8 +54,7 @@ class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
           // Content (centered)
           Center(
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 30.0, vertical: 80.0),
+              padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 80.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -94,7 +94,7 @@ class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
                         borderRadius: BorderRadius.circular(15.0),
                       ),
                       contentPadding:
-                          EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                      EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                     ),
                     controller: _email,
                   ),
@@ -111,7 +111,7 @@ class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
                         borderRadius: BorderRadius.circular(15.0),
                       ),
                       contentPadding:
-                          EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                      EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                     ),
                     controller: _password,
                   ),
@@ -121,13 +121,9 @@ class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
                       Navigator.push(
                         context,
                         PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  OrganiserSignUpPage(),
-                          transitionDuration:
-                              Duration.zero, // Removes the transition duration
-                          reverseTransitionDuration:
-                              Duration.zero, // Removes reverse transition
+                          pageBuilder: (context, animation, secondaryAnimation) => OrganiserSignUpPage(),
+                          transitionDuration: Duration.zero, // Removes the transition duration
+                          reverseTransitionDuration: Duration.zero, // Removes reverse transition
                         ),
                       );
                     },
@@ -146,18 +142,14 @@ class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
                       Navigator.push(
                         context,
                         PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  LoginPage(),
-                          transitionDuration:
-                              Duration.zero, // Removes the transition duration
-                          reverseTransitionDuration:
-                              Duration.zero, // Removes reverse transition
+                          pageBuilder: (context, animation, secondaryAnimation) => LoginPage(),
+                          transitionDuration: Duration.zero, // Removes the transition duration
+                          reverseTransitionDuration: Duration.zero, // Removes reverse transition
                         ),
                       );
                     },
                     child: Text(
-                      "User Login",
+                      "Login as User",
                       style: TextStyle(
                         color: Colors.white,
                         decoration: TextDecoration.underline,
@@ -175,13 +167,9 @@ class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
                         Navigator.push(
                           context,
                           PageRouteBuilder(
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) =>
-                                    OrganizerHomePage(),
-                            transitionDuration: Duration
-                                .zero, // Removes the transition duration
-                            reverseTransitionDuration:
-                                Duration.zero, // Removes reverse transition
+                            pageBuilder: (context, animation, secondaryAnimation) => OrganizerHomePage(),
+                            transitionDuration: Duration.zero, // Removes the transition duration
+                            reverseTransitionDuration: Duration.zero, // Removes reverse transition
                           ),
                         );
                       },
@@ -198,6 +186,7 @@ class _OrganiserLoginPageState extends State<OrganiserLoginPage> {
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+
                         ),
                       ),
                     ),

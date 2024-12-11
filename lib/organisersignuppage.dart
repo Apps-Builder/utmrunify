@@ -1,8 +1,10 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:utmrunify/main.dart';
+import 'package:utmrunify/organizerHomePage.dart';
 
 import 'auth_service.dart';
 import 'organiserloginpage.dart';
@@ -17,10 +19,13 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
 
   final _auth = AuthService();
 
+  final _name = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _contactno = TextEditingController();
   final _confirmpassword = TextEditingController();
+
+  String? userID;
 
   @override
   void initState() {
@@ -30,6 +35,7 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
   @override
   void dispose() {
     super.dispose();
+    _name.dispose();
     _email.dispose();
     _password.dispose();
     _contactno.dispose();
@@ -107,6 +113,7 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
                     child: Column(
                       children: [
                         TextFormField(
+                          controller: _name,
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.symmetric(vertical: 8.0),
                             focusedBorder: UnderlineInputBorder(
@@ -249,17 +256,33 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
   goToHome(BuildContext context) => Navigator.push(
     context,
     PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
+      pageBuilder: (context, animation, secondaryAnimation) => OrganizerHomePage(),
       transitionDuration: Duration.zero, // Removes the transition duration
       reverseTransitionDuration: Duration.zero, // Removes reverse transition
     ),
   );
 
+  uploadUserToDb() async {
+    try {
+      FirebaseFirestore.instance.collection("organisers").add({
+        "email": _email.text.trim(),
+        "contactco": _contactno.text.trim(),
+        "name": _name.text.trim(),
+        "userID": userID
+      });
+    } catch(e) {
+      print(e);
+    }
+  }
+
   _signup() async {
     final user = await _auth.createUserWithEmailAndPassword(_email.text, _password.text);
+
     if (user != null) {
+      userID = user!.uid;
       log("User created successfully");
       goToHome(context);
     }
+    uploadUserToDb();
   }
 }
