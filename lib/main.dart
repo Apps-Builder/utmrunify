@@ -1,13 +1,10 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:utmrunify/loginpage.dart';
-import 'auth_service.dart';
 import 'event_details.dart';
 import 'track_distance.dart';
+import 'shop.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Add this line
-  await Firebase.initializeApp();
+void main() {
   runApp(const MyApp());
 }
 
@@ -38,12 +35,12 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
   static final List<Widget> _pages = <Widget>[
-    HomePage(),
-    NotificationPage(),
-    RecordPage(),
-    ShopPage(),
-    ActivityPage(),
-    ProfilePage(),
+    const HomePage(),
+    const NotificationPage(),
+    const RecordPage(),
+    const ShopPage(),  // Added ShopPage here
+    const ActivityPage(),
+    const ProfilePage(),
   ];
 
   void _onItemTapped(int index) {
@@ -64,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ProfilePage()),
+              MaterialPageRoute(builder: (context) => const ProfilePage()),
             );
           },
         ),
@@ -89,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
-            label: 'Shop',
+            label: 'Shop',  // 'Shop' tab should navigate to ShopPage
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history_toggle_off_rounded),
@@ -186,10 +183,10 @@ class HomePage extends StatelessWidget {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                  MaterialPageRoute(
-                                    builder: (context) => EventDetailsPage(event: event),
-                                  ),
-                                 );
+                                    MaterialPageRoute(
+                                      builder: (context) => EventDetailsPage(event: event),
+                                    ),
+                                  );
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color.fromARGB(255, 119, 0, 50),
@@ -218,6 +215,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
+// RunningEvent class and mock event data
 class RunningEvent {
   final String name;
   final String date;
@@ -227,16 +225,16 @@ class RunningEvent {
   final String collectTime;
   final String collectLocation;
 
-
-  RunningEvent(this.name, this.date, this.location, this.imagePath,this.collectDate,this.collectTime,this.collectLocation);
+  RunningEvent(this.name, this.date, this.location, this.imagePath, this.collectDate, this.collectTime, this.collectLocation);
 }
 
 final List<RunningEvent> runningEvents = [
-  RunningEvent('UNBOCS 24 RUN', 'Nov 15', 'Student Union Building UTM', 'assets/image/unbocs.jpg','13-14 November 2024','12.00 p.m - 4.00 p.m','Dewan Sultan Iskandar'),
-  RunningEvent('Larian Seloka', 'Dec 22', 'Stadium Azman Hashim UTM', 'assets/image/seloka.jpg','21 December 2024','12.00 p.m - 4.00 p.m','Dewan Sultan Iskandar'),
-  RunningEvent('Night Trail', 'Jan 05', 'Mountain Path', 'assets/image/night.jpg','04 January 2025','12.00 p.m - 4.00 p.m','Dewan Sultan Iskandar'),
+  RunningEvent('UNBOCS 24 RUN', 'Nov 15', 'Student Union Building UTM', 'assets/image/unbocs.jpg', '13-14 November 2024', '12.00 p.m - 4.00 p.m', 'Dewan Sultan Iskandar'),
+  RunningEvent('Larian Seloka', 'Dec 22', 'Stadium Azman Hashim UTM', 'assets/image/seloka.jpg', '21 December 2024', '12.00 p.m - 4.00 p.m', 'Dewan Sultan Iskandar'),
+  RunningEvent('Night Trail', 'Jan 05', 'Mountain Path', 'assets/image/night.jpg', '04 January 2025', '12.00 p.m - 4.00 p.m', 'Dewan Sultan Iskandar'),
 ];
 
+// Placeholder Pages
 class NotificationPage extends StatelessWidget {
   const NotificationPage({super.key});
 
@@ -255,15 +253,6 @@ class RecordPage extends StatelessWidget {
   }
 }
 
-class ShopPage extends StatelessWidget {
-  const ShopPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Shop Page'));
-  }
-}
-
 class ActivityPage extends StatelessWidget {
   const ActivityPage({super.key});
 
@@ -274,8 +263,8 @@ class ActivityPage extends StatelessWidget {
 }
 
 class ProfilePage extends StatelessWidget {
-  ProfilePage({super.key});
-  final _auth = AuthService();
+  const ProfilePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -293,42 +282,9 @@ class ProfilePage extends StatelessWidget {
                 labelText: 'Enter your username',
               ),
             ),
-            Container(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async {
-                  await _auth.signout();
-                  goToLogin(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF870C14), // Button color
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  textStyle: TextStyle(fontSize: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20), // Rounded corners
-                  ),
-                ),
-
-                child: Text(
-                  "Sign Out",
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
     );
   }
 }
-
-goToLogin(BuildContext context) => Navigator.push(
-  context,
-  PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => LoginPage(),
-    transitionDuration: Duration.zero, // Removes the transition duration
-    reverseTransitionDuration: Duration.zero, // Removes reverse transition
-  ),
-);
