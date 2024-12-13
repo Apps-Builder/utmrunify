@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -17,6 +18,11 @@ class RegisterEventPage extends StatefulWidget {
 
 class _RegisterEventPageState extends State<RegisterEventPage> {
   final _formKey = GlobalKey<FormState>();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  //Controllers to manage user input
+  final TextEditingController _
+
   bool _agreedToTerms = false;
 
   @override
@@ -26,7 +32,7 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); 
+            Navigator.pop(context);
           },
         ),
         title: Text('Register Event'),
@@ -37,15 +43,10 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
           key: _formKey,
           child: ListView(
             children: [
-              
               buildTextField('Event Name*', 'eg. UNBOCS RUN'),
               SizedBox(height: 16),
-              
-              
               buildTextField('Category*', 'eg. 5KM'),
               SizedBox(height: 16),
-
-              
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -59,9 +60,7 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
                               child: Text(value),
                             ))
                         .toList(),
-                    onChanged: (value) {
-                      
-                    },
+                    onChanged: (value) {},
                   ),
                   SizedBox(width: 16),
                   Expanded(child: buildTextField('', '9:00')),
@@ -74,17 +73,13 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
                               child: Text(value),
                             ))
                         .toList(),
-                    onChanged: (value) {
-                      
-                    },
+                    onChanged: (value) {},
                   ),
                 ],
               ),
               SizedBox(height: 16),
-
-              
-              buildTextField('Date*', 'Select date', readOnly: true, onTap: () async {
-                
+              buildTextField('Date*', 'Select date', readOnly: true,
+                  onTap: () async {
                 await showDatePicker(
                   context: context,
                   initialDate: DateTime.now(),
@@ -93,20 +88,14 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
                 );
               }),
               SizedBox(height: 16),
-
-              
               buildTextField('Organizer Name*', 'eg. MUHAMMAD'),
               SizedBox(height: 16),
-
-              
-              buildTextField('Contact No*', 'eg. 0111.....', keyboardType: TextInputType.phone),
+              buildTextField('Contact No*', 'eg. 0111.....',
+                  keyboardType: TextInputType.phone),
               SizedBox(height: 16),
-
-              
-              buildTextField('Email*', 'eg. Ali@graduate.utm.my', keyboardType: TextInputType.emailAddress),
+              buildTextField('Email*', 'eg. Ali@graduate.utm.my',
+                  keyboardType: TextInputType.emailAddress),
               SizedBox(height: 16),
-
-              
               Row(
                 children: [
                   Checkbox(
@@ -126,23 +115,22 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
                 ],
               ),
               SizedBox(height: 16),
-
-             
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red, 
+                  backgroundColor: Colors.red,
                   padding: EdgeInsets.symmetric(vertical: 16),
                   textStyle: TextStyle(fontSize: 16),
                 ),
                 onPressed: () {
                   if (_formKey.currentState!.validate() && _agreedToTerms) {
-                    
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Form submitted successfully!')),
                     );
                   } else if (!_agreedToTerms) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Please agree to the terms and conditions')),
+                      SnackBar(
+                          content:
+                              Text('Please agree to the terms and conditions')),
                     );
                   }
                 },
@@ -156,7 +144,9 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
   }
 
   Widget buildTextField(String label, String placeholder,
-      {bool readOnly = false, VoidCallback? onTap, TextInputType keyboardType = TextInputType.text}) {
+      {bool readOnly = false,
+      VoidCallback? onTap,
+      TextInputType keyboardType = TextInputType.text}) {
     return TextFormField(
       decoration: InputDecoration(
         labelText: label,
