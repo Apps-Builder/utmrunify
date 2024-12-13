@@ -100,13 +100,17 @@ SizedBox(height: 16),
               SizedBox(height: 16),
               buildTextField('Date*', 'Select date', controller: _dateController, readOnly: true,
                   onTap: () async {
-                await showDatePicker(
+                DateTime? selectedDate = await showDatePicker(
                   context: context,
                   initialDate: DateTime.now(),
                   firstDate: DateTime(2000),
                   lastDate: DateTime(2100),
                 );
-                
+                if (selectedDate != null) {
+                  setState(() {
+                    _dateController.text = "${selectedDate.toLocal()}".split(' ')[0]; // Format as YYYY-MM-DD
+                  });
+                }
               }),
               SizedBox(height: 16),
               buildTextField('Organizer Name*', 'eg. MUHAMMAD', controller: _organizerNameController),
