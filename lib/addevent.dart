@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'eventdetailpage.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -171,7 +172,7 @@ SizedBox(height: 16),
 
   Future<void> saveEventToFirestore() async {
   try {
-    await _firestore.collection('events').add({
+    DocumentReference docRef = await _firestore.collection('events').add({
   'eventName': _eventNameController.text.trim(),
   'category': _categoryController.text.trim(),
   'startTime': _startTimeController.text,
@@ -187,9 +188,19 @@ SizedBox(height: 16),
   'createdAt': FieldValue.serverTimestamp(),
 });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Event registered successfully!')),
+DocumentSnapshot docSnapshot = await docRef.get();
+    final eventData = docSnapshot.data() as Map<String, dynamic>;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EventDetailsPage(eventData: eventData),
+      ),
     );
+
+    //ScaffoldMessenger.of(context).showSnackBar(
+      //SnackBar(content: Text('Event registered successfully!')),
+    //);
     _clearFormFields();
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
