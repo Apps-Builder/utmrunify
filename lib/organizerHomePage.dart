@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:utmrunify/editparticipant.dart';
 import 'addevent.dart';
 import 'manageeventpage.dart';
+import 'editparticipant.dart';
 
 class OrganizerHomePage extends StatelessWidget {
   @override
@@ -43,7 +45,6 @@ class HomePage extends StatelessWidget {
               ],
             ),
           ),
-
           Container(
             height: 200,
             child: ListView(
@@ -52,25 +53,21 @@ class HomePage extends StatelessWidget {
                 EventCard(
                   date: 'OCT\n12',
                   title: 'UNBOCS\' Run',
-                  image: 'assets/img/unbocs.jpg',
+                  image: 'assets/image/unbocs.jpg',
                 ),
-
                 EventCard(
                   date: 'NOV\n23',
                   title: 'KELIP-KELIP\' Run',
-                  image: 'assets/img/Kelip2.jpeg',
+                  image: 'assets/image/Kelip2.jpeg',
                 ),
-
                 EventCard(
                   date: 'DEC\n21',
                   title: 'SELOKA\' Run',
-                  image: 'assets/img/Seloka.jpeg',
+                  image: 'assets/image/Seloka.jpeg',
                 ),
-                // Add more EventCards here
               ],
             ),
           ),
-          // Grid buttons
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: GridView.count(
@@ -83,7 +80,13 @@ class HomePage extends StatelessWidget {
                 FeatureButton(
                   icon: Icons.people,
                   label: 'Participants',
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => EditParticipant()),
+                    );
+                  },
                 ),
                 FeatureButton(
                   icon: Icons.event,
