@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'addevent.dart';
+import 'manageeventpage.dart';
 
 class OrganizerHomePage extends StatelessWidget {
   @override
@@ -87,7 +88,13 @@ class HomePage extends StatelessWidget {
                 FeatureButton(
                   icon: Icons.event,
                   label: 'Manage Event',
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ManageEventPage()),
+                    );
+                  },
                 ),
                 FeatureButton(
                   icon: Icons.add_circle,
