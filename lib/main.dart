@@ -15,7 +15,9 @@ import 'event_details.dart';
 import 'track_distance.dart';
 import 'shop.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Add this line
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -277,13 +279,6 @@ class ActivityPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const TrackingDistance();
   }
-}
-
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
-
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
 }
 
 goToLogin(BuildContext context) => Navigator.push(
