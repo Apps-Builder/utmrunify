@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:utmrunify/loginpage.dart';
+import 'package:utmrunify/userprofilepage.dart';
 import 'auth_service.dart';
 import 'event_details.dart';
 import 'track_distance.dart';
@@ -36,7 +41,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
-
+  final _auth = AuthService();
   static final List<Widget> _pages = <Widget>[
     HomePage(),
     NotificationPage(),
@@ -50,6 +55,12 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _auth.listenForTokenChanges(); // Start listening for token changes
   }
 
   @override
@@ -270,57 +281,6 @@ class ActivityPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const TrackingDistance();
-  }
-}
-
-class ProfilePage extends StatelessWidget {
-  ProfilePage({super.key});
-  final _auth = AuthService();
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('User Profile'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Profile Page Content Here'),
-            TextFormField(
-              decoration: const InputDecoration(
-                border: UnderlineInputBorder(),
-                labelText: 'Enter your username',
-              ),
-            ),
-            Container(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async {
-                  await _auth.signout();
-                  goToLogin(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF870C14), // Button color
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  textStyle: TextStyle(fontSize: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20), // Rounded corners
-                  ),
-                ),
-
-                child: Text(
-                  "Sign Out",
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
 
