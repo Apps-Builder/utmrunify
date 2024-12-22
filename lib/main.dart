@@ -1,6 +1,18 @@
+
 import 'package:firebase_core/firebase_core.dart';
+
+import 'dart:io';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:utmrunify/loginpage.dart';
+
+import 'package:utmrunify/userprofilepage.dart';
+import 'auth_service.dart';
+
 import 'event_details.dart';
 import 'track_distance.dart';
 import 'shop.dart';
@@ -34,7 +46,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
-
+  final _auth = AuthService();
   static final List<Widget> _pages = <Widget>[
     const HomePage(),
     const NotificationPage(),
@@ -48,6 +60,12 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _auth.listenForTokenChanges(); // Start listening for token changes
   }
 
   @override
@@ -263,165 +281,12 @@ class ActivityPage extends StatelessWidget {
   }
 }
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
-
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends State<ProfilePage> {
-  String _profilePicture = 'assets/profile_placeholder.png'; // Placeholder for profile picture
-  final List<String> _addresses = []; // List of shop addresses
-  final TextEditingController _addressController = TextEditingController(); // Controller for address input
-  final TextEditingController _nameController = TextEditingController(); // Controller for name input
-  final TextEditingController _genderController = TextEditingController(); // Controller for gender input
-  final TextEditingController _birthdateController = TextEditingController(); // Controller for birthdate input
-
-  void _pickProfilePicture() async {
-    // Simulate picking a profile picture
-    // Replace this with actual image picker logic if needed
-    setState(() {
-      _profilePicture = 'assets/new_profile_picture.png'; // Update with new picture path
-    });
-  }
-
-  void _addAddress() {
-    if (_addressController.text.isNotEmpty) {
-      setState(() {
-        _addresses.add(_addressController.text);
-        _addressController.clear(); // Clear the input field after adding
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('User Profile'),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Profile Picture Section
-              Center(
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      onTap: _pickProfilePicture,
-                      child: CircleAvatar(
-                        radius: 50,
-                        backgroundImage: AssetImage(_profilePicture),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text('Tap to change profile picture'),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Name Section
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Enter your name',
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Gender Section
-              TextFormField(
-                controller: _genderController,
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Enter your gender',
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Birthdate Section
-              TextFormField(
-                controller: _birthdateController,
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Enter your birthdate',
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Username Section
-              TextFormField(
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Enter your username',
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Add Address Section
-              const Text(
-                'Shop Addresses',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _addressController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Enter new address',
-                ),
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: _addAddress,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 119, 0, 50),
-                ),
-                child: const Text('Add Address'),
-              ),
-              const SizedBox(height: 20),
-              // Address List
-              const Text(
-                'Added Addresses:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              _addresses.isEmpty
-                  ? const Text('No addresses added yet.')
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: _addresses.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(_addresses[index]),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () {
-                              setState(() {
-                                _addresses.removeAt(index); // Remove the address
-                              });
-                            },
-                          ),
-                        );
-                      },
-                    ),
-              const SizedBox(height: 20),
-              // Display the entered information
-              const Text(
-                'Profile Information:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text('Name: ${_nameController.text}'),
-              Text('Gender: ${_genderController.text}'),
-              Text('Birthdate: ${_birthdateController.text}'),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
+goToLogin(BuildContext context) => Navigator.push(
+  context,
+  PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => LoginPage(),
+    transitionDuration: Duration.zero, // Removes the transition duration
+    reverseTransitionDuration: Duration.zero, // Removes reverse transition
+  ),
+);
 

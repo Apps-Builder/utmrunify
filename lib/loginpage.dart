@@ -1,41 +1,35 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:utmrunify/organisersignuppage.dart';
+import 'package:utmrunify/organizerHomePage.dart';
+import 'package:utmrunify/usersignuppage.dart';
 
 import 'auth_service.dart';
 import 'main.dart';
-import 'organiserloginpage.dart';
 
 class LoginPage extends StatefulWidget {
-
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-
+  final _formKey = GlobalKey<FormState>();
   final _auth = AuthService();
   final _email = TextEditingController();
   final _password = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void dispose() {
-    super.dispose();
     _email.dispose();
     _password.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       backgroundColor: Color.fromRGBO(246, 247, 252, 1),
       body: Stack(
         children: [
@@ -43,153 +37,224 @@ class _LoginPageState extends State<LoginPage> {
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(
-                    'assets/image/background.png'), // Replace with your image path
+                image: AssetImage('assets/image/background.png'),
                 fit: BoxFit.cover,
                 alignment: Alignment.centerLeft,
               ),
             ),
           ),
-          // Semi-transparent overlay (optional for better contrast)
+          // Semi-transparent overlay
           Container(
             color: Color(0xFFD3BB).withOpacity(0.3),
           ),
-          // Content (centered)
+          // Content
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 80.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // UTMRunify Title
-                  RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'UTM',
-                          style: TextStyle(
-                            color: Color(0xFF870C14),
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // UTMRunify Title
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'UTM',
+                            style: TextStyle(
+                              color: Color(0xFF870C14),
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        TextSpan(
-                          text: 'RUNIFY',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
+                          TextSpan(
+                            text: 'RUNIFY',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Icon(Icons.directions_run, size: 100.0, color: Colors.white),
-                  Spacer(), // Spacing between title and form
-
-                  // UTMID text field
-                  TextField(
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'UTM Email',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                      contentPadding:
-                      EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                    ),
-                    controller: _email,
-                  ),
-                  SizedBox(height: 15), // Spacing between fields
-
-                  // Password text field
-                  TextField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Password',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                      contentPadding:
-                      EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                    ),
-                    controller: _password,
-                  ),
-                  SizedBox(height: 15),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation, secondaryAnimation) => OrganiserLoginPage(),
-                          transitionDuration: Duration.zero, // Removes the transition duration
-                          reverseTransitionDuration: Duration.zero, // Removes reverse transition
-                        ),
-                      );
-                    },
-                    child: Text(
-                      "Login as Organiser",
-                      style: TextStyle(
-                        color: Colors.white,
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colors.white,
+                        ],
                       ),
                     ),
-                  ),
-                  SizedBox(height: 80), // Spacing before the button
+                    Icon(Icons.directions_run, size: 100.0, color: Colors.white),
+                    Spacer(),
 
-                  // Log In button
-                  SizedBox(
-                    width: double.infinity, // Full width button
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        _login();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF870C14), // Button color
-                        padding: EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(
+                    // Email text field
+                    TextFormField(
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'E-mail',
+                        border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15.0),
                         ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                       ),
+                      controller: _email,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Email is required';
+                        }
+                        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                          return 'Please enter a valid email address';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 15),
+
+                    // Password text field
+                    TextFormField(
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Password',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                      ),
+                      controller: _password,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Password is required';
+                        }
+                        if (value.length < 6) {
+                          return 'Password must be at least 6 characters long';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 10),
+
+                    // Links
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) => UserSignUpPage(),
+                            transitionDuration: Duration.zero,
+                            reverseTransitionDuration: Duration.zero,
+                          ),
+                        );
+                      },
                       child: Text(
-                        'Log In',
+                        "Sign Up as User",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
                           decorationColor: Colors.white,
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: 15),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) => OrganiserSignUpPage(),
+                            transitionDuration: Duration.zero,
+                            reverseTransitionDuration: Duration.zero,
+                          ),
+                        );
+                      },
+                      child: Text(
+                        "Sign Up as Organiser",
+                        style: TextStyle(
+                          color: Colors.white,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 80),
+
+                    // Log In button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            await _login();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF870C14),
+                          padding: EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                        ),
+                        child: Text(
+                          'Log In',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ],
       ),
     );
-
   }
+
+  goToOrganiserHomePage(BuildContext context) => Navigator.push(
+    context,
+    PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => OrganizerHomePage(),
+      transitionDuration: Duration.zero,
+      reverseTransitionDuration: Duration.zero,
+    ),
+  );
+
   goToHome(BuildContext context) => Navigator.push(
     context,
     PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
-      transitionDuration: Duration.zero, // Removes the transition duration
-      reverseTransitionDuration: Duration.zero, // Removes reverse transition
+      transitionDuration: Duration.zero,
+      reverseTransitionDuration: Duration.zero,
     ),
   );
 
   _login() async {
     final user = await _auth.loginUserWithEmailAndPassword(_email.text, _password.text);
     if (user != null) {
-      log("User logged in successfully");
-      goToHome(context);
+      String userId = user!.uid;
+
+      // Fetch user document from Firestore
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+      if (userDoc.exists) {
+        String userType = userDoc['usertype'];
+
+        if (userType == 'organiser') {
+          goToOrganiserHomePage(context);
+        } else if (userType == 'user') {
+          goToHome(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Invalid user type')),
+          );
+        }
+      } else {
+        log("User document does not exist");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User not found in database')),
+        );
+      }
     }
   }
-
 }

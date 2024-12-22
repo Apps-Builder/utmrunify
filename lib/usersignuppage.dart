@@ -2,77 +2,169 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:utmrunify/main.dart';
-import 'package:utmrunify/organizerHomePage.dart';
 
 import 'auth_service.dart';
 
-class OrganiserSignUpPage extends StatefulWidget {
+class UserSignUpPage extends StatefulWidget {
   @override
-  _OrganiserSignUpState createState() => _OrganiserSignUpState();
+  _UserSignUpState createState() => _UserSignUpState();
 }
 
-class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
-  final _formKey = GlobalKey<FormState>();
+class _UserSignUpState extends State<UserSignUpPage> {
+  final _formKey = GlobalKey<FormState>(); // Add form key
   final _auth = AuthService();
 
-  final _name = TextEditingController();
+  final _fullname = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _contactno = TextEditingController();
   final _confirmpassword = TextEditingController();
+  final _height = TextEditingController();
+  final _weight = TextEditingController();
+  final _dob = TextEditingController();
 
-  bool _isChecked = false;
+  String? _selectedGender;
   String? userID;
+  bool _isChecked = false;
 
   @override
   void dispose() {
     super.dispose();
-    _name.dispose();
+    _fullname.dispose();
     _email.dispose();
     _password.dispose();
     _contactno.dispose();
     _confirmpassword.dispose();
+    _height.dispose();
+    _weight.dispose();
+    _dob.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Organiser Signup'),
+        title: const Text('User Signup'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25),
-            child: Form(
+            child: Form( // Wrap in Form widget
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 15),
                   Text(
-                    "Organiser Details",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    "User Details",
+                    style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 4),
-                  Divider(
-                    color: Color(0xFF870C14),
-                    thickness: 2,
-                  ),
+                  Divider(color: Color(0xFF870C14), thickness: 2),
                   SizedBox(height: 15),
 
-                  // Organiser Name
+                  // Full Name
                   TextFormField(
-                    controller: _name,
-                    decoration: InputDecoration(labelText: 'Organiser Name'),
+                    controller: _fullname,
+                    decoration: InputDecoration(labelText: 'Full Name'),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Organiser name is required';
+                        return 'Full name is required';
+                      }
+                      return null;
+                    },
+                  ),
+
+                  SizedBox(height: 16),
+
+                  // Gender
+                  DropdownButtonFormField<String>(
+                    value: _selectedGender,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedGender = value;
+                      });
+                    },
+                    items: ['Male', 'Female', 'Other']
+                        .map((gender) => DropdownMenuItem<String>(
+                      value: gender,
+                      child: Text(gender),
+                    ))
+                        .toList(),
+                    decoration: InputDecoration(labelText: 'Gender'),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Gender is required';
+                      }
+                      return null;
+                    },
+                  ),
+
+                  SizedBox(height: 16),
+
+                  // Date of Birth
+                  TextFormField(
+                    controller: _dob,
+                    decoration: InputDecoration(
+                      labelText: 'Date of Birth',
+                      suffixIcon: Icon(Icons.calendar_today),
+                    ),
+                    readOnly: true,
+                    onTap: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime.now(),
+                      );
+                      if (pickedDate != null) {
+                        setState(() {
+                          _dob.text = "${pickedDate.toLocal()}".split(' ')[0];
+                        });
+                      }
+                    },
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Date of birth is required';
+                      }
+                      return null;
+                    },
+                  ),
+
+                  SizedBox(height: 16),
+
+                  // Height
+                  TextFormField(
+                    controller: _height,
+                    decoration: InputDecoration(labelText: 'Height (cm)'),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Height is required';
+                      }
+                      if (double.tryParse(value) == null) {
+                        return 'Enter a valid number';
+                      }
+                      return null;
+                    },
+                  ),
+
+                  SizedBox(height: 16),
+
+                  // Weight
+                  TextFormField(
+                    controller: _weight,
+                    decoration: InputDecoration(labelText: 'Weight (kg)'),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Weight is required';
+                      }
+                      if (double.tryParse(value) == null) {
+                        return 'Enter a valid number';
                       }
                       return null;
                     },
@@ -168,8 +260,6 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
                       ),
                     ],
                   ),
-
-
                   SizedBox(height: 20),
 
                   // Sign Up Button
@@ -199,7 +289,7 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
     );
   }
 
-  void _signup() async {
+  _signup() async {
     if (_formKey.currentState!.validate()) {
       if (_isChecked) {
         final user = await _auth.createUserWithEmailAndPassword(_email.text, _password.text);
@@ -226,9 +316,13 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
       FirebaseFirestore.instance.collection("users").doc(userID).set({
         "email": _email.text.trim(),
         "contactno": _contactno.text.trim(),
-        "name": _name.text.trim(),
+        "height": _height.text.trim(),
+        "weight": _weight.text.trim(),
+        "dateofbirth": _dob.text.trim(),
+        "gender": _selectedGender,
+        "name": _fullname.text.trim(),
         "userID": userID,
-        "usertype": "organiser"
+        "usertype": "user"
       });
     } catch (e) {
       print(e);
@@ -239,10 +333,11 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
     Navigator.push(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => OrganizerHomePage(),
+        pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
       ),
     );
   }
 }
+
