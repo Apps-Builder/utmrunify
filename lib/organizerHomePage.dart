@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:utmrunify/organiserprofilepage.dart';
 import 'package:utmrunify/editparticipant.dart';
 import 'addevent.dart';
 import 'manageeventpage.dart';
@@ -23,7 +24,12 @@ class HomePage extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.person),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => OrganiserProfilePage()),
+              );
+            },
           ),
         ],
       ),
