@@ -1,6 +1,4 @@
 
-import 'package:firebase_core/firebase_core.dart';
-
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -18,6 +16,8 @@ import 'track_distance.dart';
 import 'shop.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Add this line
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
