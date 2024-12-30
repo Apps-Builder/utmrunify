@@ -1,10 +1,20 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:utmrunify/loginpage.dart';
+
+import 'package:utmrunify/userprofilepage.dart';
+import 'auth_service.dart';
+
 import 'event_details.dart';
 import 'track_distance.dart';
 import 'shop.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Add this line
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -33,7 +43,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
-
+  final _auth = AuthService();
   static final List<Widget> _pages = <Widget>[
     const HomePage(),
     const NotificationPage(),
@@ -47,6 +57,12 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _auth.listenForTokenChanges(); // Start listening for token changes
   }
 
   @override
@@ -423,4 +439,12 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
+goToLogin(BuildContext context) => Navigator.push(
+  context,
+  PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => LoginPage(),
+    transitionDuration: Duration.zero, // Removes the transition duration
+    reverseTransitionDuration: Duration.zero, // Removes reverse transition
+  ),
+);
 
