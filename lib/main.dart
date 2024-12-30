@@ -37,8 +37,8 @@ class _MyHomePageState extends State<MyHomePage> {
   static final List<Widget> _pages = <Widget>[
     const HomePage(),
     const NotificationPage(),
-    const RecordPage(),
-    const ShopPage(),  // Added ShopPage here
+    const FeedbackPage(),
+    const ShopPage(), 
     const ActivityPage(),
     const ProfilePage(),
   ];
@@ -81,8 +81,8 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Notification',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.fiber_manual_record),
-            label: 'Record',
+            icon: Icon(Icons.feedback),
+            label: 'Feedback',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
@@ -244,12 +244,12 @@ class NotificationPage extends StatelessWidget {
   }
 }
 
-class RecordPage extends StatelessWidget {
-  const RecordPage({super.key});
+class FeedbackPage extends StatelessWidget {
+  const FeedbackPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Record Page'));
+    return const Center(child: Text('Feedback Page'));
   }
 }
 
@@ -272,10 +272,10 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   String _profilePicture = 'assets/profile_placeholder.png'; // Placeholder for profile picture
   final List<String> _addresses = []; // List of shop addresses
-  final TextEditingController _addressController = TextEditingController(); // Controller for address input
-  final TextEditingController _nameController = TextEditingController(); // Controller for name input
-  final TextEditingController _genderController = TextEditingController(); // Controller for gender input
-  final TextEditingController _birthdateController = TextEditingController(); // Controller for birthdate input
+  final TextEditingController _addressController = TextEditingController(); 
+  final TextEditingController _nameController = TextEditingController(); 
+  final TextEditingController _genderController = TextEditingController(); 
+  final TextEditingController _birthdateController = TextEditingController(); 
 
   void _pickProfilePicture() async {
     // Simulate picking a profile picture

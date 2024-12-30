@@ -9,6 +9,7 @@ class ShopPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Shop'),
         backgroundColor: const Color.fromARGB(255, 119, 0, 50),
+        titleTextStyle: const TextStyle(fontSize: 24,color:  Color.fromARGB(255, 255, 255, 255)),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -16,7 +17,7 @@ class ShopPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset('assets/image/shop_banner.jpg', fit: BoxFit.cover), 
+              Image.asset('assets/image/unbocs.jpg', fit: BoxFit.cover), 
               const SizedBox(height: 20),
               const Text(
                 'Most Popular',
@@ -109,31 +110,31 @@ class Product {
 
 final List<Product> products = [
   Product(
-    name: 'JomRun Cycling Jersey - Classic',
-    price: 'RM150.00',
+    name: 'Larian Seloka',
+    price: 'RM50.00',
     discountedPrice: '',
     isDiscounted: false,
-    imagePath: 'assets/image/cycling_jersey.jpg',
+    imagePath: 'assets/image/larianseloka.jpg',
   ),
   Product(
-    name: 'JomRun X Ultron Batik Collection - Tribal',
+    name: 'Unbocs Run',
     price: 'RM100.00',
     discountedPrice: 'RM29.90',
     isDiscounted: true,
-    imagePath: 'assets/image/batik_collection.jpg',
+    imagePath: 'assets/image/unbocs.jpg',
   ),
   Product(
-    name: 'Malaysia Batik T-Shirt',
+    name: 'Kelip-Kelip Run',
     price: 'RM70.00',
     discountedPrice: 'RM50.00',
     isDiscounted: true,
-    imagePath: 'assets/image/malaysia_batik.jpg',
+    imagePath: 'assets/image/Kelip2.jpeg',
   ),
   Product(
-    name: 'JomRun Socks',
+    name: 'Night Trail Run',
     price: 'RM29.90',
     discountedPrice: '',
     isDiscounted: false,
-    imagePath: 'assets/image/socks.jpg',
+    imagePath: 'assets/image/night.jpg',
   ),
 ];
