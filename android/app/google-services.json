@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "758581570852",
+    "project_id": "utmrunify-115c8",
+    "storage_bucket": "utmrunify-115c8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:758581570852:android:422a228618fd5fe21e97b1",
+        "android_client_info": {
+          "package_name": "com.example.utmrunify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4RcwTe53rRFH7rxI7bbu7l18GVuZI9bk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
