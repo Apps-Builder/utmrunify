@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -26,7 +27,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 128, 0, 53)),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color.fromARGB(255, 128, 0, 53)),
         useMaterial3: true,
       ),
       home: LoginPage(),
@@ -48,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
     const HomePage(),
     const NotificationPage(),
     const FeedbackPage(),
-    const ShopPage(), 
+    const ShopPage(),
     const ActivityPage(),
     const ProfilePage(),
   ];
@@ -102,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
-            label: 'Shop',  // 'Shop' tab should navigate to ShopPage
+            label: 'Shop', // 'Shop' tab should navigate to ShopPage
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history_toggle_off_rounded),
@@ -136,90 +138,138 @@ class HomePage extends StatelessWidget {
               'Running Events',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            const Divider(color:Color.fromARGB(255, 119, 0, 50),thickness: 3,),
+            const Divider(
+              color: Color.fromARGB(255, 119, 0, 50),
+              thickness: 3,
+            ),
             Expanded(
-              child: ListView.builder(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('events')
+                    .orderBy('createdAt', descending: true)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Center(child: Text('No events available.'));
+                  }
+
+                  final eventDocs = snapshot.data!.docs;
+
+                  return ListView.builder(
+                    itemCount: eventDocs.length,
+                    itemBuilder: (context, index) {
+                      final event =
+                          eventDocs[index].data() as Map<String, dynamic>;
+                      /*child: ListView.builder(
                 itemCount: runningEvents.length,
                 itemBuilder: (context, index) {
-                  final event = runningEvents[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 3),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Stack(
+                  final event = runningEvents[index];*/
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 3),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              height: 200,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(5),
-                                child: Image.asset(
-                                  event.imagePath,
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
+                            Stack(
+                              children: [
+                                Container(
+                                  height: 200,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(5),
+                                    child: Image.network(
+                                      event['picture'] ?? '',
+                                      /*child: Image.asset(
+                                  event.imagePath,*/
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                Positioned(
+                                  top: 8,
+                                  left: 8,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 4, horizontal: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black87,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      event['date'] ?? 'N/A',
+                                      //event.date,
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Positioned(
-                              top: 8,
-                              left: 8,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                                decoration: BoxDecoration(
-                                  color: Colors.black87,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  event.date,
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                                ),
+                            Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    event['eventName'] ?? 'Event Name',
+                                    //event.name,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(event['location'] ?? 'Location'),
+                                  //Text(event.location),
+                                  const SizedBox(height: 8),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      final runningEvent = RunningEvent(
+                                        event['eventName'] ?? 'Event Name',
+                                        event['date'] ?? 'N/A',
+                                        event['location'] ?? 'Location',
+                                        event['picture'] ??
+                                            '', // Assuming 'picture' is the key for the image URL
+                                        event['collectDate'] ?? 'N/A',
+                                        event['collectTime'] ?? 'N/A',
+                                        event['collectLocation'] ?? 'N/A',
+                                      );
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              EventDetailsPage(
+                                                  event: runningEvent),
+                                          //builder: (context) => EventDetailsPage(event: event),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          const Color.fromARGB(255, 119, 0, 50),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Register Now',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                event.name,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(event.location),
-                              const SizedBox(height: 8),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => EventDetailsPage(event: event),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color.fromARGB(255, 119, 0, 50),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Register Now',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   );
                 },
               ),
@@ -241,13 +291,35 @@ class RunningEvent {
   final String collectTime;
   final String collectLocation;
 
-  RunningEvent(this.name, this.date, this.location, this.imagePath, this.collectDate, this.collectTime, this.collectLocation);
+  RunningEvent(this.name, this.date, this.location, this.imagePath,
+      this.collectDate, this.collectTime, this.collectLocation);
 }
 
 final List<RunningEvent> runningEvents = [
-  RunningEvent('UNBOCS 24 RUN', 'Nov 15', 'Student Union Building UTM', 'assets/image/unbocs.jpg', '13-14 November 2024', '12.00 p.m - 4.00 p.m', 'Dewan Sultan Iskandar'),
-  RunningEvent('Larian Seloka', 'Dec 22', 'Stadium Azman Hashim UTM', 'assets/image/seloka.jpg', '21 December 2024', '12.00 p.m - 4.00 p.m', 'Dewan Sultan Iskandar'),
-  RunningEvent('Night Trail', 'Jan 05', 'Mountain Path', 'assets/image/night.jpg', '04 January 2025', '12.00 p.m - 4.00 p.m', 'Dewan Sultan Iskandar'),
+  RunningEvent(
+      'UNBOCS 24 RUN',
+      'Nov 15',
+      'Student Union Building UTM',
+      'assets/image/unbocs.jpg',
+      '13-14 November 2024',
+      '12.00 p.m - 4.00 p.m',
+      'Dewan Sultan Iskandar'),
+  RunningEvent(
+      'Larian Seloka',
+      'Dec 22',
+      'Stadium Azman Hashim UTM',
+      'assets/image/seloka.jpg',
+      '21 December 2024',
+      '12.00 p.m - 4.00 p.m',
+      'Dewan Sultan Iskandar'),
+  RunningEvent(
+      'Night Trail',
+      'Jan 05',
+      'Mountain Path',
+      'assets/image/night.jpg',
+      '04 January 2025',
+      '12.00 p.m - 4.00 p.m',
+      'Dewan Sultan Iskandar'),
 ];
 
 // Placeholder Pages
@@ -286,18 +358,20 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String _profilePicture = 'assets/profile_placeholder.png'; // Placeholder for profile picture
+  String _profilePicture =
+      'assets/profile_placeholder.png'; // Placeholder for profile picture
   final List<String> _addresses = []; // List of shop addresses
-  final TextEditingController _addressController = TextEditingController(); 
-  final TextEditingController _nameController = TextEditingController(); 
-  final TextEditingController _genderController = TextEditingController(); 
-  final TextEditingController _birthdateController = TextEditingController(); 
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _genderController = TextEditingController();
+  final TextEditingController _birthdateController = TextEditingController();
 
   void _pickProfilePicture() async {
     // Simulate picking a profile picture
     // Replace this with actual image picker logic if needed
     setState(() {
-      _profilePicture = 'assets/new_profile_picture.png'; // Update with new picture path
+      _profilePicture =
+          'assets/new_profile_picture.png'; // Update with new picture path
     });
   }
 
@@ -414,7 +488,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             icon: const Icon(Icons.delete),
                             onPressed: () {
                               setState(() {
-                                _addresses.removeAt(index); // Remove the address
+                                _addresses
+                                    .removeAt(index); // Remove the address
                               });
                             },
                           ),
@@ -440,11 +515,10 @@ class _ProfilePageState extends State<ProfilePage> {
 }
 
 goToLogin(BuildContext context) => Navigator.push(
-  context,
-  PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => LoginPage(),
-    transitionDuration: Duration.zero, // Removes the transition duration
-    reverseTransitionDuration: Duration.zero, // Removes reverse transition
-  ),
-);
-
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => LoginPage(),
+        transitionDuration: Duration.zero, // Removes the transition duration
+        reverseTransitionDuration: Duration.zero, // Removes reverse transition
+      ),
+    );
