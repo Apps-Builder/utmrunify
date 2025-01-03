@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'homepage.dart';
 import 'participants_details.dart';
 import 'main.dart';
 
@@ -12,30 +13,23 @@ class RunSelectionPage extends StatefulWidget {
 }
 
 class _RunSelectionPageState extends State<RunSelectionPage> {
-  bool is5kmSelected = true;
-  bool is10kmSelected = false;
+  String selectedCategoryName = ''; // To track the selected category
   String selectedSize = 'Size';
   int _currentIndex = 0;
+  double subtotal = 0.0; // Initialize subtotal to 0.0
 
   @override
   Widget build(BuildContext context) {
-    final entitlements = is5kmSelected
-        ? [
-            '1. 5KM UNBOCS\'24 finisher jersey',
-            '2. 5KM finisher medal',
-            '3. 5KM race bib',
-            '4. E-certificate',
-            '5. Refreshments',
-          ]
-        : [
-            '1. 10KM UNBOCS\'24 finisher jersey',
-            '2. 10KM finisher medal',
-            '3. 10KM race bib',
-            '4. E-certificate',
-            '5. Refreshments',
-          ];
+    // Find the selected category based on the selected category name
+    var selectedCategory = widget.selectedEvent.categories.firstWhere(
+          (category) => category.name == selectedCategoryName,
+      orElse: () => widget.selectedEvent.categories.first, // Default to the first category
+    );
 
-    final subtotal = is5kmSelected ? 'RM45.00' : 'RM60.00';
+    final entitlements = selectedCategory.entitlements;
+
+    // Update the subtotal based on the price of the selected category
+    subtotal = selectedCategory.price;
 
     return Scaffold(
       appBar: AppBar(
@@ -67,58 +61,36 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            // Interactive Selection for 5KM
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  is5kmSelected = true;
-                  is10kmSelected = false;
-                });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('5KM selected')),
+            // Display categories dynamically from selectedEvent
+            Wrap(
+              spacing: 5.0, // Horizontal space between items
+              runSpacing: 8.0, // Vertical space between rows
+              children: widget.selectedEvent.categories.map((category) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedCategoryName = category.name;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('${category.name} selected')),
+                    );
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: selectedCategoryName == category.name
+                          ? const Color.fromARGB(255, 119, 0, 50)
+                          : Colors.grey[300],
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Text(
+                      category.name,
+                      style: const TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
                 );
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: is5kmSelected
-                      ? const Color.fromARGB(255, 119, 0, 50)
-                      : Colors.grey[300],
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: const Text(
-                  '5KM',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            // Interactive Selection for 10KM
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  is5kmSelected = false;
-                  is10kmSelected = true;
-                });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('10KM selected')),
-                );
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: is10kmSelected
-                      ? const Color.fromARGB(255, 119, 0, 50)
-                      : Colors.grey[300],
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: const Text(
-                  '10KM',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
+              }).toList(),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -126,10 +98,19 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            ...entitlements.map((item) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: Text(item),
-                )),
+            // Display entitlements based on the selected category
+            ...entitlements.asMap().entries.map((entry) {
+              int index = entry.key; // This is the index of the item
+              String item = entry.value; // This is the item itself
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: Text(
+                  '${index + 1}. $item', // Add the index number and the item
+                  style: const TextStyle(fontSize: 16),
+                ),
+              );
+            }).toList(),
+
             const SizedBox(height: 16),
             DropdownButton<String>(
               value: selectedSize,
@@ -162,21 +143,19 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Subtotal $subtotal',
+                  'Subtotal \$${subtotal.toStringAsFixed(2)}', // Display the dynamic subtotal
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    String selectedCategory =
-                        is5kmSelected ? '5KM run' : '10KM run';
                     Navigator.push(
                       context,
                       PageRouteBuilder(
                         pageBuilder: (context, animation, secondaryAnimation) =>
                             ParticipantFormPage(
-                          category: selectedCategory,
-                          selectedEvent: widget.selectedEvent,
-                        ),
+                              category: selectedCategoryName,
+                              selectedEvent: widget.selectedEvent,
+                            ),
                         transitionsBuilder: (context, animation, secondaryAnimation, child) {
                           const begin = Offset(1.0, 0.0);
                           const end = Offset.zero;

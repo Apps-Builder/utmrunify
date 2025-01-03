@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'homepage.dart';
 import 'main.dart';
-import 'registerevent.dart'; 
+import 'registerevent.dart';
 
 class EventDetailsPage extends StatelessWidget {
   final RunningEvent event;
@@ -28,7 +29,7 @@ class EventDetailsPage extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 image: DecorationImage(
-                  image: AssetImage(event.imagePath),
+                  image: NetworkImage(event.imageUrl),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -46,7 +47,7 @@ class EventDetailsPage extends StatelessWidget {
               children: [
                 const Icon(Icons.calendar_today, color: Color.fromARGB(255, 119, 0, 50)),
                 const SizedBox(width: 8),
-                Text(event.date),
+                Text(event.eventDate),
               ],
             ),
             const SizedBox(height: 8),
@@ -63,9 +64,37 @@ class EventDetailsPage extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 119, 0, 50)),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Runner\'s entitlement: \n\n1. Finisher jersey\n2. Finisher Medal\n3. Race bib\n4. E-certificate\n5. Refreshments',
+
+            // Display categories and their entitlements
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: event.categories.map<Widget>((category) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${category.name}:',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ...List.generate(
+                        category.entitlements.length,
+                            (index) => Text(
+                          '${index + 1}. ${category.entitlements[index]}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
             ),
+
             const Divider(height: 32, color: Color.fromARGB(255, 119, 0, 50), thickness: 3),
             const Text(
               'RACE KIT COLLECTION',
@@ -73,19 +102,22 @@ class EventDetailsPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Date: ${event.collectDate}\n'
-              'Time: ${event.collectTime}\n'
-              'Venue: ${event.collectLocation}\n',
+              'Date: ${event.raceKitCollectionDate}\n'
+                  'Time: ${event.raceKitCollectionTime}\n'
+                  'Venue: ${event.raceKitCollectionVenue}\n',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 24),
+
             // Sign Up Button
             Center(
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => RunSelectionPage(selectedEvent: event)),
+                    MaterialPageRoute(
+                      builder: (context) => RunSelectionPage(selectedEvent: event),
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
@@ -107,3 +139,4 @@ class EventDetailsPage extends StatelessWidget {
     );
   }
 }
+
