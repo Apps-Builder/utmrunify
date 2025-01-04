@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'main.dart';
+import 'registerevent.dart'; 
 
 class EventDetailsPage extends StatelessWidget {
   final RunningEvent event;
@@ -43,7 +44,7 @@ class EventDetailsPage extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.calendar_today,color:Color.fromARGB(255, 119, 0, 50)),
+                const Icon(Icons.calendar_today, color: Color.fromARGB(255, 119, 0, 50)),
                 const SizedBox(width: 8),
                 Text(event.date),
               ],
@@ -51,30 +52,30 @@ class EventDetailsPage extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.location_on,color:Color.fromARGB(255, 119, 0, 50) ,),
+                const Icon(Icons.location_on, color: Color.fromARGB(255, 119, 0, 50)),
                 const SizedBox(width: 8),
                 Text(event.location),
               ],
             ),
-            const Divider(height: 32,color: Color.fromARGB(255, 119, 0, 50),thickness: 3,),
+            const Divider(height: 32, color: Color.fromARGB(255, 119, 0, 50), thickness: 3),
             const Text(
               'ABOUT',
-              style: TextStyle(fontWeight: FontWeight.bold,color:Color.fromARGB(255, 119, 0, 50)),
+              style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 119, 0, 50)),
             ),
             const SizedBox(height: 8),
             const Text(
               'Runner\'s entitlement: \n\n1. Finisher jersey\n2. Finisher Medal\n3. Race bib\n4. E-certificate\n5. Refreshments',
             ),
-            const Divider(height: 32,color: Color.fromARGB(255, 119, 0, 50),thickness: 3),
+            const Divider(height: 32, color: Color.fromARGB(255, 119, 0, 50), thickness: 3),
             const Text(
               'RACE KIT COLLECTION',
-              style: TextStyle(fontWeight: FontWeight.bold,color:Color.fromARGB(255, 119, 0, 50)),
+              style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 119, 0, 50)),
             ),
             const SizedBox(height: 8),
             Text(
-              'Date: ${event.collectDate }\n'
-              'Time: ${event.collectTime }\n'
-              'Venue: ${event.collectLocation }\n',
+              'Date: ${event.collectDate}\n'
+              'Time: ${event.collectTime}\n'
+              'Venue: ${event.collectLocation}\n',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 24),
@@ -82,7 +83,10 @@ class EventDetailsPage extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // Implement sign-up functionality or confirmation
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RunSelectionPage(selectedEvent: event)),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),

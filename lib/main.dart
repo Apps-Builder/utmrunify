@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:utmrunify/loginpage.dart';
 import 'event_details.dart';
 import 'track_distance.dart';
+import 'shop.dart';
+import 'feedback.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +20,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 128, 0, 53)),
         useMaterial3: true,
       ),
-      home: const MyHomePage(),
+      home: LoginPage(),
     );
   }
 }
@@ -35,8 +38,8 @@ class _MyHomePageState extends State<MyHomePage> {
   static final List<Widget> _pages = <Widget>[
     const HomePage(),
     const NotificationPage(),
-    const RecordPage(),
-    const ShopPage(),
+    const FeedbackPage(),
+    const ShopPage(), 
     const ActivityPage(),
     const ProfilePage(),
   ];
@@ -79,12 +82,12 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Notification',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.fiber_manual_record),
-            label: 'Record',
+            icon: Icon(Icons.feedback),
+            label: 'Feedback',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
-            label: 'Shop',
+            label: 'Shop',  // 'Shop' tab should navigate to ShopPage
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history_toggle_off_rounded),
@@ -181,10 +184,10 @@ class HomePage extends StatelessWidget {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                  MaterialPageRoute(
-                                    builder: (context) => EventDetailsPage(event: event),
-                                  ),
-                                 );
+                                    MaterialPageRoute(
+                                      builder: (context) => EventDetailsPage(event: event),
+                                    ),
+                                  );
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color.fromARGB(255, 119, 0, 50),
@@ -213,6 +216,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
+// RunningEvent class and mock event data
 class RunningEvent {
   final String name;
   final String date;
@@ -222,16 +226,16 @@ class RunningEvent {
   final String collectTime;
   final String collectLocation;
 
-
-  RunningEvent(this.name, this.date, this.location, this.imagePath,this.collectDate,this.collectTime,this.collectLocation);
+  RunningEvent(this.name, this.date, this.location, this.imagePath, this.collectDate, this.collectTime, this.collectLocation);
 }
 
 final List<RunningEvent> runningEvents = [
-  RunningEvent('UNBOCS 24 RUN', 'Nov 15', 'Student Union Building UTM', 'assets/image/unbocs.jpg','13-14 November 2024','12.00 p.m - 4.00 p.m','Dewan Sultan Iskandar'),
-  RunningEvent('Larian Seloka', 'Dec 22', 'Stadium Azman Hashim UTM', 'assets/image/seloka.jpg','21 December 2024','12.00 p.m - 4.00 p.m','Dewan Sultan Iskandar'),
-  RunningEvent('Night Trail', 'Jan 05', 'Mountain Path', 'assets/image/night.jpg','04 January 2025','12.00 p.m - 4.00 p.m','Dewan Sultan Iskandar'),
+  RunningEvent('UNBOCS 24 RUN', 'Nov 15', 'Student Union Building UTM', 'assets/image/unbocs.jpg', '13-14 November 2024', '12.00 p.m - 4.00 p.m', 'Dewan Sultan Iskandar'),
+  RunningEvent('Larian Seloka', 'Dec 22', 'Stadium Azman Hashim UTM', 'assets/image/seloka.jpg', '21 December 2024', '12.00 p.m - 4.00 p.m', 'Dewan Sultan Iskandar'),
+  RunningEvent('Night Trail', 'Jan 05', 'Mountain Path', 'assets/image/night.jpg', '04 January 2025', '12.00 p.m - 4.00 p.m', 'Dewan Sultan Iskandar'),
 ];
 
+// Placeholder Pages
 class NotificationPage extends StatelessWidget {
   const NotificationPage({super.key});
 
@@ -241,35 +245,46 @@ class NotificationPage extends StatelessWidget {
   }
 }
 
-class RecordPage extends StatelessWidget {
-  const RecordPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Record Page'));
-  }
-}
-
-class ShopPage extends StatelessWidget {
-  const ShopPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Shop Page'));
-  }
-}
-
 class ActivityPage extends StatelessWidget {
   const ActivityPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return TrackingDistance();
+    return const TrackingDistance();
   }
 }
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String _profilePicture = 'assets/profile_placeholder.png'; // Placeholder for profile picture
+  final List<String> _addresses = []; // List of shop addresses
+  final TextEditingController _addressController = TextEditingController(); 
+  final TextEditingController _nameController = TextEditingController(); 
+  final TextEditingController _genderController = TextEditingController(); 
+  final TextEditingController _birthdateController = TextEditingController(); 
+
+  void _pickProfilePicture() async {
+    // Simulate picking a profile picture
+    // Replace this with actual image picker logic if needed
+    setState(() {
+      _profilePicture = 'assets/new_profile_picture.png'; // Update with new picture path
+    });
+  }
+
+  void _addAddress() {
+    if (_addressController.text.isNotEmpty) {
+      setState(() {
+        _addresses.add(_addressController.text);
+        _addressController.clear(); // Clear the input field after adding
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -277,20 +292,127 @@ class ProfilePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('User Profile'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Profile Page Content Here'),
-            TextFormField(
-              decoration: const InputDecoration(
-                border: UnderlineInputBorder(),
-                labelText: 'Enter your username',
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Profile Picture Section
+              Center(
+                child: Column(
+                  children: [
+                    GestureDetector(
+                      onTap: _pickProfilePicture,
+                      child: CircleAvatar(
+                        radius: 50,
+                        backgroundImage: AssetImage(_profilePicture),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text('Tap to change profile picture'),
+                  ],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              // Name Section
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  border: UnderlineInputBorder(),
+                  labelText: 'Enter your name',
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Gender Section
+              TextFormField(
+                controller: _genderController,
+                decoration: const InputDecoration(
+                  border: UnderlineInputBorder(),
+                  labelText: 'Enter your gender',
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Birthdate Section
+              TextFormField(
+                controller: _birthdateController,
+                decoration: const InputDecoration(
+                  border: UnderlineInputBorder(),
+                  labelText: 'Enter your birthdate',
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Username Section
+              TextFormField(
+                decoration: const InputDecoration(
+                  border: UnderlineInputBorder(),
+                  labelText: 'Enter your username',
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Add Address Section
+              const Text(
+                'Shop Addresses',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _addressController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Enter new address',
+                ),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: _addAddress,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 119, 0, 50),
+                ),
+                child: const Text('Add Address'),
+              ),
+              const SizedBox(height: 20),
+              // Address List
+              const Text(
+                'Added Addresses:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              _addresses.isEmpty
+                  ? const Text('No addresses added yet.')
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _addresses.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(_addresses[index]),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {
+                              setState(() {
+                                _addresses.removeAt(index); // Remove the address
+                              });
+                            },
+                          ),
+                        );
+                      },
+                    ),
+              const SizedBox(height: 20),
+              // Display the entered information
+              const Text(
+                'Profile Information:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text('Name: ${_nameController.text}'),
+              Text('Gender: ${_genderController.text}'),
+              Text('Birthdate: ${_birthdateController.text}'),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
+
