@@ -1,43 +1,19 @@
 import 'package:firebase_core/firebase_core.dart';
-//import 'package:firebase_storage/firebase_storage.dart';
-//import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:utmrunify/loginpage.dart';
-/*import 'package:image_picker/image_picker.dart';
-
 
 import 'package:utmrunify/userprofilepage.dart';
 import 'auth_service.dart';
 
 import 'event_details.dart';
 import 'track_distance.dart';
-import 'shop.dart';*/
+import 'shop.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Add this line
-  await Firebase.initializeApp();
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 128, 0, 53)),
-        useMaterial3: true,
-      ),
-      home: LoginPage(),
-    );
-  }
-}
-
-/*class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
   @override
@@ -522,4 +498,4 @@ goToLogin(BuildContext context) => Navigator.push(
         transitionDuration: Duration.zero, // Removes the transition duration
         reverseTransitionDuration: Duration.zero, // Removes reverse transition
       ),
-    );*/
+    );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
-import 'registerevent.dart'; 
+//import 'main.dart';
+import 'registerevent.dart';
+import 'userhomepage.dart';
 
 class EventDetailsPage extends StatelessWidget {
   final RunningEvent event;
@@ -44,7 +45,8 @@ class EventDetailsPage extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.calendar_today, color: Color.fromARGB(255, 119, 0, 50)),
+                const Icon(Icons.calendar_today,
+                    color: Color.fromARGB(255, 119, 0, 50)),
                 const SizedBox(width: 8),
                 Text(event.date),
               ],
@@ -52,24 +54,35 @@ class EventDetailsPage extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.location_on, color: Color.fromARGB(255, 119, 0, 50)),
+                const Icon(Icons.location_on,
+                    color: Color.fromARGB(255, 119, 0, 50)),
                 const SizedBox(width: 8),
                 Text(event.location),
               ],
             ),
-            const Divider(height: 32, color: Color.fromARGB(255, 119, 0, 50), thickness: 3),
+            const Divider(
+                height: 32,
+                color: Color.fromARGB(255, 119, 0, 50),
+                thickness: 3),
             const Text(
               'ABOUT',
-              style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 119, 0, 50)),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 119, 0, 50)),
             ),
             const SizedBox(height: 8),
             const Text(
               'Runner\'s entitlement: \n\n1. Finisher jersey\n2. Finisher Medal\n3. Race bib\n4. E-certificate\n5. Refreshments',
             ),
-            const Divider(height: 32, color: Color.fromARGB(255, 119, 0, 50), thickness: 3),
+            const Divider(
+                height: 32,
+                color: Color.fromARGB(255, 119, 0, 50),
+                thickness: 3),
             const Text(
               'RACE KIT COLLECTION',
-              style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 119, 0, 50)),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 119, 0, 50)),
             ),
             const SizedBox(height: 8),
             Text(
@@ -85,11 +98,14 @@ class EventDetailsPage extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => RunSelectionPage(selectedEvent: event)),
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            RunSelectionPage(selectedEvent: event)),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                   backgroundColor: const Color.fromARGB(255, 119, 0, 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
