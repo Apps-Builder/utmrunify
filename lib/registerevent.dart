@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'homepage.dart';
 import 'participants_details.dart';
-import 'main.dart';
 
 class RunSelectionPage extends StatefulWidget {
   final RunningEvent selectedEvent;
@@ -15,7 +14,6 @@ class RunSelectionPage extends StatefulWidget {
 class _RunSelectionPageState extends State<RunSelectionPage> {
   String selectedCategoryName = ''; // To track the selected category
   String selectedSize = 'Size';
-  int _currentIndex = 0;
   double subtotal = 0.0; // Initialize subtotal to 0.0
 
   @override
@@ -29,7 +27,7 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
     final entitlements = selectedCategory.entitlements;
 
     // Update the subtotal based on the price of the selected category
-    subtotal = selectedCategory.price;
+    subtotal = selectedCategoryName.isNotEmpty ? selectedCategory.price : 0.0;
 
     return Scaffold(
       appBar: AppBar(
@@ -86,7 +84,12 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
                     ),
                     child: Text(
                       category.name,
-                      style: const TextStyle(fontSize: 16, color: Colors.white),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: selectedCategoryName == category.name
+                            ? Colors.white
+                            : Colors.black,
+                      ),
                     ),
                   ),
                 );
@@ -147,21 +150,24 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: selectedCategoryName.isNotEmpty && selectedSize != 'Size'
+                      ? () {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
                         pageBuilder: (context, animation, secondaryAnimation) =>
                             ParticipantFormPage(
-                              category: selectedCategoryName,
+                              category: selectedCategory,
                               selectedEvent: widget.selectedEvent,
                             ),
-                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
                           const begin = Offset(1.0, 0.0);
                           const end = Offset.zero;
                           const curve = Curves.easeInOut;
 
-                          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                          var tween = Tween(begin: begin, end: end)
+                              .chain(CurveTween(curve: curve));
                           var offsetAnimation = animation.drive(tween);
 
                           return SlideTransition(
@@ -171,11 +177,12 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
                         },
                       ),
                     );
-                  },
+                  }
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 119, 0, 50),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   ),
                   child: const Text('SUBMIT'),
                 ),
@@ -184,45 +191,6 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Selected: ${_getNavLabel(index)}')),
-          );
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.notifications), label: 'Notifications'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.fiber_manual_record), label: 'Record'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_bag), label: 'Shop'),
-          BottomNavigationBarItem(icon: Icon(Icons.directions_run), label: 'Activity'),
-        ],
-        selectedItemColor: const Color.fromARGB(255, 119, 0, 50),
-        unselectedItemColor: Colors.black,
-      ),
     );
-  }
-
-  String _getNavLabel(int index) {
-    switch (index) {
-      case 0:
-        return 'Home';
-      case 1:
-        return 'Notifications';
-      case 2:
-        return 'Record';
-      case 3:
-        return 'Shop';
-      case 4:
-        return 'Activity';
-      default:
-        return '';
-    }
   }
 }

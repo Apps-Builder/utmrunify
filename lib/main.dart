@@ -5,12 +5,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:utmrunify/loginpage.dart';
 
 import 'package:utmrunify/userprofilepage.dart';
 import 'auth_service.dart';
 
+import 'consts.dart';
 import 'event_details.dart';
 import 'homepage.dart';
 import 'track_distance.dart';
@@ -19,7 +21,13 @@ import 'shop.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Add this line
   await Firebase.initializeApp();
+  await _setup();
   runApp(const MyApp());
+}
+
+Future<void> _setup() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Stripe.publishableKey = stripePublishableKey;
 }
 
 class MyApp extends StatelessWidget {
