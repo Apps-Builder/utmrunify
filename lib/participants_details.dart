@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:utmrunify/main.dart';
+//import 'package:utmrunify/main.dart';
+import 'userhomepage.dart';
 
 class ParticipantFormPage extends StatefulWidget {
   final String category;
   final RunningEvent selectedEvent;
 
-  const ParticipantFormPage({super.key, required this.category, required this.selectedEvent});
+  const ParticipantFormPage(
+      {super.key, required this.category, required this.selectedEvent});
 
   @override
   _ParticipantFormPageState createState() => _ParticipantFormPageState();
@@ -44,24 +46,31 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
                   'Category',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
-                const Divider(color: Color.fromARGB(255, 119, 0, 50), thickness: 2),
+                const Divider(
+                    color: Color.fromARGB(255, 119, 0, 50), thickness: 2),
                 Text(widget.category, style: const TextStyle(fontSize: 16)),
                 const SizedBox(height: 16),
                 const Text(
                   'Participant Details',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
-                const Divider(color: Color.fromARGB(255, 119, 0, 50), thickness: 2),
+                const Divider(
+                    color: Color.fromARGB(255, 119, 0, 50), thickness: 2),
                 const SizedBox(height: 8),
                 _buildTextField('Full name', (value) => fullName = value),
                 const SizedBox(height: 8),
                 _buildTextField('Nationality', (value) => nationality = value),
                 const SizedBox(height: 8),
-                _buildTextField('Passport/NRIC', (value) => passportOrNric = value),
+                _buildTextField(
+                    'Passport/NRIC', (value) => passportOrNric = value),
                 const SizedBox(height: 8),
-                _buildTextField('Contact Number', (value) => contactNumber = value, keyboardType: TextInputType.phone),
+                _buildTextField(
+                    'Contact Number', (value) => contactNumber = value,
+                    keyboardType: TextInputType.phone),
                 const SizedBox(height: 8),
-                _buildTextField('Emergency Contact Number', (value) => emergencyContact = value, keyboardType: TextInputType.phone),
+                _buildTextField('Emergency Contact Number',
+                    (value) => emergencyContact = value,
+                    keyboardType: TextInputType.phone),
                 const SizedBox(height: 8),
                 _buildTextField('Address', (value) => address = value),
                 const SizedBox(height: 16),
@@ -93,26 +102,32 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
                               setState(() {
                                 isLoading = true;
                               });
-                              await Future.delayed(const Duration(seconds: 2)); // Simulate form submission
+                              await Future.delayed(const Duration(
+                                  seconds: 2)); // Simulate form submission
                               setState(() {
                                 isLoading = false;
                               });
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Form submitted successfully!')),
+                                const SnackBar(
+                                    content:
+                                        Text('Form submitted successfully!')),
                               );
                             } else if (!isAgreed) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Please agree to the terms')),
+                                const SnackBar(
+                                    content: Text('Please agree to the terms')),
                               );
                             }
                           },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 119, 0, 50),
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 12),
                     ),
                     child: isLoading
                         ? const CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
                           )
                         : const Text('SUBMIT'),
                   ),
@@ -125,10 +140,14 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
-          BottomNavigationBarItem(icon: Icon(Icons.fiber_manual_record), label: 'Record'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_bag), label: 'Shop'),
-          BottomNavigationBarItem(icon: Icon(Icons.directions_run), label: 'Activity'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.notifications), label: 'Notifications'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.fiber_manual_record), label: 'Record'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_bag), label: 'Shop'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.directions_run), label: 'Activity'),
         ],
         selectedItemColor: const Color.fromARGB(255, 119, 0, 50),
         unselectedItemColor: Colors.black,
@@ -136,7 +155,8 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
     );
   }
 
-  Widget _buildTextField(String label, Function(String) onChanged, {TextInputType keyboardType = TextInputType.text}) {
+  Widget _buildTextField(String label, Function(String) onChanged,
+      {TextInputType keyboardType = TextInputType.text}) {
     return TextFormField(
       keyboardType: keyboardType,
       decoration: InputDecoration(labelText: label),

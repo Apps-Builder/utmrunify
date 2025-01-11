@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:utmrunify/main.dart';
+//import 'package:utmrunify/main.dart';
 import 'package:utmrunify/organizerHomePage.dart';
 
 import 'auth_service.dart';

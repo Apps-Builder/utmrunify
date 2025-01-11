@@ -6,7 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
 
 import 'auth_service.dart';
-import 'main.dart';
+//import 'main.dart';
+import 'userhomepage.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

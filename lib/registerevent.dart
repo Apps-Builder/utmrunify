@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'participants_details.dart';
-import 'main.dart';
+//import 'main.dart';
+import 'userhomepage.dart';
 
 class RunSelectionPage extends StatefulWidget {
   final RunningEvent selectedEvent;
@@ -51,7 +52,8 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
             tooltip: 'Cart',
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Cart functionality coming soon!')),
+                const SnackBar(
+                    content: Text('Cart functionality coming soon!')),
               );
             },
           ),
@@ -163,7 +165,8 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
               children: [
                 Text(
                   'Subtotal $subtotal',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -177,12 +180,14 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
                           category: selectedCategory,
                           selectedEvent: widget.selectedEvent,
                         ),
-                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
                           const begin = Offset(1.0, 0.0);
                           const end = Offset.zero;
                           const curve = Curves.easeInOut;
 
-                          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                          var tween = Tween(begin: begin, end: end)
+                              .chain(CurveTween(curve: curve));
                           var offsetAnimation = animation.drive(tween);
 
                           return SlideTransition(
@@ -221,8 +226,10 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
               icon: Icon(Icons.notifications), label: 'Notifications'),
           BottomNavigationBarItem(
               icon: Icon(Icons.fiber_manual_record), label: 'Record'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_bag), label: 'Shop'),
-          BottomNavigationBarItem(icon: Icon(Icons.directions_run), label: 'Activity'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_bag), label: 'Shop'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.directions_run), label: 'Activity'),
         ],
         selectedItemColor: const Color.fromARGB(255, 119, 0, 50),
         unselectedItemColor: Colors.black,

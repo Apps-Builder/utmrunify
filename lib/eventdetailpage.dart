@@ -47,7 +47,7 @@ class EventDetailsPage extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              'Price: \$${eventData['price']?.toString() ?? '0'}',
+              'Price: \$${eventData['price']/*?.toString()*/ ?? '0'}',
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 16),

@@ -3,7 +3,6 @@ import 'package:utmrunify/organiserprofilepage.dart';
 import 'package:utmrunify/editparticipant.dart';
 import 'addevent.dart';
 import 'manageeventpage.dart';
-import 'editparticipant.dart';
 
 class OrganizerHomePage extends StatelessWidget {
   @override

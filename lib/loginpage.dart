@@ -7,7 +7,8 @@ import 'package:utmrunify/organizerHomePage.dart';
 import 'package:utmrunify/usersignuppage.dart';
 
 import 'auth_service.dart';
-import 'main.dart';
+//import 'main.dart';
+import 'userhomepage.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -50,7 +51,8 @@ class _LoginPageState extends State<LoginPage> {
           // Content
           Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 80.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 30.0, vertical: 80.0),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -79,7 +81,8 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                     ),
-                    Icon(Icons.directions_run, size: 100.0, color: Colors.white),
+                    Icon(Icons.directions_run,
+                        size: 100.0, color: Colors.white),
                     Spacer(),
 
                     // Email text field
@@ -91,7 +94,8 @@ class _LoginPageState extends State<LoginPage> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15.0),
                         ),
-                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                       ),
                       controller: _email,
                       validator: (value) {
@@ -116,7 +120,8 @@ class _LoginPageState extends State<LoginPage> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15.0),
                         ),
-                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                       ),
                       controller: _password,
                       validator: (value) {
@@ -137,7 +142,9 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.push(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) => UserSignUpPage(),
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    UserSignUpPage(),
                             transitionDuration: Duration.zero,
                             reverseTransitionDuration: Duration.zero,
                           ),
@@ -158,7 +165,9 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.push(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) => OrganiserSignUpPage(),
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    OrganiserSignUpPage(),
                             transitionDuration: Duration.zero,
                             reverseTransitionDuration: Duration.zero,
                           ),
@@ -212,30 +221,35 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   goToOrganiserHomePage(BuildContext context) => Navigator.push(
-    context,
-    PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => OrganizerHomePage(),
-      transitionDuration: Duration.zero,
-      reverseTransitionDuration: Duration.zero,
-    ),
-  );
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              OrganizerHomePage(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
+      );
 
   goToHome(BuildContext context) => Navigator.push(
-    context,
-    PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
-      transitionDuration: Duration.zero,
-      reverseTransitionDuration: Duration.zero,
-    ),
-  );
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
+      );
 
   _login() async {
-    final user = await _auth.loginUserWithEmailAndPassword(_email.text, _password.text);
+    final user =
+        await _auth.loginUserWithEmailAndPassword(_email.text, _password.text);
     if (user != null) {
-      String userId = user!.uid;
+      String userId = user.uid;
 
       // Fetch user document from Firestore
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
 
       if (userDoc.exists) {
         String userType = userDoc['usertype'];
