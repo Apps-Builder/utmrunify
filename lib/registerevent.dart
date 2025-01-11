@@ -29,7 +29,7 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
 
     // Update the subtotal based on the price of the selected category
     subtotal = selectedCategoryName.isNotEmpty ? selectedCategory.price : 0.0;
-
+  print(selectedCategory.price);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(

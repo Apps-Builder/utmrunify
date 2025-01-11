@@ -8,22 +8,29 @@ class StripeService {
 
   static final StripeService instance = StripeService._();
 
-  Future<void> makePayment() async {
+  Future<bool> makePayment(int subtotal) async {
     try {
       String? paymentIntentClientSecret = await _createPaymentIntent(
-        100,
+        subtotal,
         "myr",
       );
-      if (paymentIntentClientSecret == null) return;
+      if (paymentIntentClientSecret == null) return false;
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: paymentIntentClientSecret,
-          merchantDisplayName: "Hussain Mustafa",
+          merchantDisplayName: "UTM RUNIFY",
         ),
       );
-      await _processPayment();
+
+      if (await _processPayment()) {
+        return true;
+      } else {
+        return false;
+      }
+
     } catch (e) {
       print(e);
+      return false;
     }
   }
 
@@ -57,12 +64,14 @@ class StripeService {
     return null;
   }
 
-  Future<void> _processPayment() async {
+  Future<bool> _processPayment() async {
     try {
       await Stripe.instance.presentPaymentSheet();
-      await Stripe.instance.confirmPaymentSheetPayment();
+
+      return true;
     } catch (e) {
       print(e);
+      return false;
     }
   }
 

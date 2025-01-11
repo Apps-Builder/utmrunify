@@ -6,7 +6,7 @@ import 'event_details.dart';
 class Category {
   final String name;
   final List<String> entitlements;
-  final double price; // Add price property
+  final double price; // Change price to int
 
   Category({
     required this.name,
@@ -19,7 +19,7 @@ class Category {
     return Category(
       name: map['name'] ?? '',
       entitlements: List<String>.from(map['entitlements'] ?? []),
-      price: map['price'] != null ? double.tryParse(map['price'].toString()) ?? 0.0 : 0.0, // Parse price and handle null or invalid values
+      price: map['price'] != null ? double.tryParse(map['price'].toString()) ?? 0 : 0, // Parse price as int
     );
   }
 }

@@ -19,7 +19,12 @@ class ParticipantFormPage extends StatefulWidget {
 class _ParticipantFormPageState extends State<ParticipantFormPage> {
   final _formKey = GlobalKey<FormState>();
   final _auth = AuthService();
+  late final String userID;
   final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController passportNoController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+  final TextEditingController emergencyContactNameController = TextEditingController();
+  final TextEditingController emergencyContactController = TextEditingController();
   final TextEditingController contactNumberController = TextEditingController();
   final TextEditingController dobController = TextEditingController();
   final TextEditingController postCodeController = TextEditingController();
@@ -33,7 +38,7 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
   String fullName = '';
   String contactNumber = '';
   String selectedNationality = '';
-  String passportOrNric = '';
+
   String emergencyContact = '';
   String gender = '';
   String address = '';
@@ -60,6 +65,10 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
 
       // Clear all text fields
       fullNameController.clear();
+      passportNoController.clear();
+      addressController.clear();
+      emergencyContactNameController.clear();
+      emergencyContactController.clear();
       contactNumberController.clear();
       dobController.clear();
       postCodeController.clear();
@@ -115,8 +124,8 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
 
   Future<void> _getUserDetails() async {
     try {
-      final userId = _auth.getUserID();
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+      userID = _auth.getUserID();
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(userID).get();
 
       if (userDoc.exists) {
         setState(() {
@@ -144,9 +153,8 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
         setState(() {
           fullNameController.text = userDoc.data()!['name'] ?? '';
           contactNumberController.text = userDoc.data()!['contactno'] ?? '';
-          dobController.text = userDoc.data()!['dob'] ?? ''; // Autofill DOB
+          dobController.text = userDoc.data()!['dateofbirth'] ?? ''; // Autofill DOB
           emailController.text = userDoc.data()!['email'] ?? ''; // Autofill Email
-          gender = userDoc.data()!['gender'] ?? ''; // Autofill Gender
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -177,6 +185,10 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
   @override
   void dispose() {
     fullNameController.dispose();
+    passportNoController.dispose();
+    addressController.dispose();
+    emergencyContactNameController.dispose();
+    emergencyContactController.dispose();
     contactNumberController.dispose();
     dobController.dispose();
     postCodeController.dispose();
@@ -233,8 +245,14 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 const Divider(color: Color.fromARGB(255, 119, 0, 50), thickness: 2),
+                ...List.generate(
+                  widget.category.entitlements.length,
+                      (index) => Text(
+                    '${index + 1}. ${widget.category.entitlements[index]}',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ),
                 Text("", style: const TextStyle(fontSize: 16)),
-                const SizedBox(height: 16),
                 const Text(
                   'Participant Details',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -285,26 +303,32 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
                   ],
                 ),
                 _buildTextField(
-                  'Full name',
+                  'Full Name*',
                       (value) => fullNameController.text = value,
                   controller: fullNameController,
                 ),
                 const SizedBox(height: 8),
                 _buildTextField(
-                  'Contact Number',
+                  'Contact Number*',
                       (value) => contactNumberController.text = value,
                   controller: contactNumberController,
                   keyboardType: TextInputType.phone,
                 ),
+                _buildTextField(
+                  'Passport No*',
+                      (value) => passportNoController.text = value,
+                  controller: passportNoController,
+                  keyboardType: TextInputType.phone,
+                ),
                 const SizedBox(height: 8),
                 _buildDropdownField(
-                  'Nationality',
+                  'Nationality*',
                   countries,
                       (value) => selectedNationality = value!,
                 ),
                 const SizedBox(height: 8),
                 _buildDropdownField(
-                  'Gender',
+                  'Gender*',
                   genders,
                       (value) => gender = value!,
                 ),
@@ -313,24 +337,26 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
                   onTap: () => _selectDateOfBirth(context),
                   child: AbsorbPointer(
                     child: _buildTextField(
-                      'Date of Birth',
+                      'Date of Birth*',
                           (value) => dobController.text = value,
                       controller: dobController,
                     ),
                   ),
                 ),
                 const SizedBox(height: 8),
-                _buildTextField('Post Code', (value) => postCodeController.text = value, controller: postCodeController),
+                _buildTextField('Address*', (value) => addressController.text = value, controller: addressController),
                 const SizedBox(height: 8),
-                _buildTextField('City', (value) => cityController.text = value, controller: cityController),
+                _buildTextField('Post Code*', (value) => postCodeController.text = value, controller: postCodeController),
                 const SizedBox(height: 8),
-                _buildTextField('State', (value) => stateController.text = value, controller: stateController),
+                _buildTextField('City*', (value) => cityController.text = value, controller: cityController),
                 const SizedBox(height: 8),
-                _buildTextField('Email Address', (value) => emailController.text = value, controller: emailController, keyboardType: TextInputType.emailAddress),
+                _buildTextField('State*', (value) => stateController.text = value, controller: stateController),
+                const SizedBox(height: 8),
+                _buildTextField('Email Address*', (value) => emailController.text = value, controller: emailController, keyboardType: TextInputType.emailAddress),
                 const SizedBox(height: 8),
                 // Add Residential Country Dropdown
                 _buildDropdownField(
-                  'Residential Country',
+                  'Residential Country*',
                   residentialCountries,
                       (value) {
                     setState(() {
@@ -342,25 +368,37 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
                 const SizedBox(height: 8),
                 // Add Residential State Dropdown
                 _buildDropdownField(
-                  'Residential State',
+                  'State*',
                   residentialStates,
                       (value) => selectedResidentialState = value!,
                 ),
                 const SizedBox(height: 8),
+                _buildTextField(
+                  'Emergency Contact Name*',
+                      (value) => emergencyContactNameController.text = value,
+                  controller: emergencyContactNameController,
+                ),
+                const SizedBox(height: 8),
+                _buildTextField(
+                  'Emergency Contact*',
+                      (value) => emergencyContactController.text = value,
+                  controller: emergencyContactController,
+                ),
+                const SizedBox(height: 8),
                 _buildDropdownField(
-                  'Emergency Contact Relationship',
+                  'Emergency Contact Relationship*',
                   emergencyRelationships,
                       (value) => emergencyRelationshipController.text = value!,
                 ),
                 const SizedBox(height: 8),
                 _buildDropdownField(
-                  'Blood Type',
+                  'Blood Type*',
                   bloodTypes,
                       (value) => bloodTypeController.text = value!,
                 ),
                 const SizedBox(height: 8),
                 _buildTextField(
-                  'Medical Conditions',
+                  'Medical Conditions*',
                       (value) => medicalConditionsController.text = value,
                   controller: medicalConditionsController,
                 ),
@@ -390,7 +428,20 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
                         ? null
                         : () async {
                       if (_formKey.currentState!.validate() && isAgreed) {
-                          StripeService.instance.makePayment();
+                          if (await StripeService.instance.makePayment(widget.category.price.toInt())) {
+                            uploadInfoToDb();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Payment success. Registration success.'))
+                            );
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => MyHomePage()),  // Replace with your homepage widget
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Payment failed. Please try again.'))
+                            );
+                          }
                       } else if (!isAgreed) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Please agree to the terms')),
@@ -454,4 +505,31 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
       },
     );
   }
+
+  void uploadInfoToDb() async {
+    try {
+      FirebaseFirestore.instance.collection("registration").doc().set({
+        "userID": userID,
+        "eventName": widget.selectedEvent.name,
+        "email": emailController.text.trim(),
+        "contactno": contactNumberController.text.trim(),
+        "dateofbirth": dobController.text.trim(),
+        "gender": gender,  // Assuming _selectedGender is a variable you have in your code
+        "name": fullNameController.text.trim(),
+        "passportNo": passportNoController.text.trim(),
+        "address": addressController.text.trim(),
+        "emergencyContactName": emergencyContactNameController.text.trim(),
+        "emergencyContact": emergencyContactController.text.trim(),
+        "postCode": postCodeController.text.trim(),
+        "city": cityController.text.trim(),
+        "state": stateController.text.trim(),
+        "emergencyRelationship": emergencyRelationshipController.text.trim(),
+        "bloodType": bloodTypeController.text.trim(),
+        "medicalConditions": medicalConditionsController.text.trim(),
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
 }
