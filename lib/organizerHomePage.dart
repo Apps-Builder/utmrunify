@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:utmrunify/organiserprofilepage.dart';
-import 'package:utmrunify/editparticipant.dart';
 import 'addevent.dart';
 import 'manageeventpage.dart';
 import 'editparticipant.dart';
+import 'reviewfeedback.dart';
 
 class OrganizerHomePage extends StatelessWidget {
   @override
@@ -118,8 +118,14 @@ class HomePage extends StatelessWidget {
                 ),
                 FeatureButton(
                   icon: Icons.bar_chart,
-                  label: 'Report',
-                  onPressed: () {},
+                  label: 'Feedback',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ReviewFeedbackPage()),
+                    );
+                  },
                 ),
               ],
             ),
