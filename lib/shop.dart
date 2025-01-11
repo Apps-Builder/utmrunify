@@ -10,7 +10,7 @@ class ShopPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Shop'),
         backgroundColor: const Color.fromARGB(255, 119, 0, 50),
-        titleTextStyle: const TextStyle(fontSize: 24, color: Color.fromARGB(255, 255, 255, 255)),
+        titleTextStyle: const TextStyle(fontSize: 24, color: Colors.white),
       ),
       body: const ProductList(),
     );
@@ -38,18 +38,55 @@ class _ProductListState extends State<ProductList> {
   Future<void> _fetchProducts() async {
     try {
       QuerySnapshot querySnapshot = await _collectionRef.get();
+      List<Product> fetchedProducts = querySnapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return Product(
+          name: data['name'] ?? '',
+          price: data['price'] ?? '',
+          discountedPrice: data['discountedPrice'] ?? '',
+          isDiscounted: data['isDiscounted'] ?? false,
+          imagePath: data['imagePath'] ?? '',
+          description: data['description'] ?? '',
+        );
+      }).toList();
+
+      final predefinedProducts = [
+        Product(
+          name: 'Larian Seloka',
+          price: 'RM50.00',
+          discountedPrice: '',
+          isDiscounted: false,
+          imagePath: 'assets/image/larianseloka.jpg',
+          description: 'Description for Larian Seloka.',
+        ),
+        Product(
+          name: 'Unbocs Run',
+          price: 'RM100.00',
+          discountedPrice: 'RM29.90',
+          isDiscounted: true,
+          imagePath: 'assets/image/unbocs.jpg',
+          description: 'Description for Unbocs Run.',
+        ),
+        Product(
+          name: 'Kelip-Kelip Run',
+          price: 'RM70.00',
+          discountedPrice: 'RM50.00',
+          isDiscounted: true,
+          imagePath: 'assets/image/Kelip2.jpeg',
+          description: 'Description for Kelip-Kelip Run.',
+        ),
+        Product(
+          name: 'Night Trail Run',
+          price: 'RM29.90',
+          discountedPrice: '',
+          isDiscounted: false,
+          imagePath: 'assets/image/night.jpg',
+          description: 'Description for Night Trail Run.',
+        ),
+      ];
+
       setState(() {
-        _products = querySnapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          return Product(
-            name: data['name'] ?? '',
-            price: data['price'] ?? '',
-            discountedPrice: data['discountedPrice'] ?? '',
-            isDiscounted: data['isDiscounted'] ?? false,
-            imagePath: data['imagePath'] ?? '',
-            description: data['description'] ?? '',
-          );
-        }).toList();
+        _products = fetchedProducts + predefinedProducts;
         _isLoading = false;
       });
     } catch (e) {
@@ -102,10 +139,15 @@ class _ProductListState extends State<ProductList> {
                         Expanded(
                           child: ClipRRect(
                             borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-                            child: Image.network(
-                              product.imagePath,
-                              fit: BoxFit.cover,
-                            ),
+                            child: product.imagePath.startsWith('http')
+                                ? Image.network(
+                                    product.imagePath,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.asset(
+                                    product.imagePath,
+                                    fit: BoxFit.cover,
+                                  ),
                           ),
                         ),
                         Padding(
@@ -214,7 +256,7 @@ class ProductDetails extends StatelessWidget {
   }
 
   void _navigateToQR(BuildContext context) {
-    Navigator.pop(context); // Close the size dialog
+    Navigator.pop(context); // Close the dialog
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const QRPage()),
@@ -236,7 +278,6 @@ class QRPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Display the QR image
             Image.asset(
               'assets/image/qr.jpg',
               width: 200,
