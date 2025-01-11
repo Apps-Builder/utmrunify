@@ -1,5 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // Ensure Firebase is initialized
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Shop App',
+      theme: ThemeData(primarySwatch: Colors.pink),
+      home: const ShopPage(),
+    );
+  }
+}
 
 class ShopPage extends StatelessWidget {
   const ShopPage({super.key});
@@ -11,6 +32,7 @@ class ShopPage extends StatelessWidget {
         title: const Text('Shop'),
         backgroundColor: const Color.fromARGB(255, 119, 0, 50),
         titleTextStyle: const TextStyle(fontSize: 24, color: Colors.white),
+        leading: null,
       ),
       body: const ProductList(),
     );
@@ -25,7 +47,10 @@ class ProductList extends StatefulWidget {
 }
 
 class _ProductListState extends State<ProductList> {
-  final CollectionReference _collectionRef = FirebaseFirestore.instance.collection('shop');
+  final CollectionReference _collectionRef = FirebaseFirestore.instance
+      .collection('shop')
+      .doc('shopDB')
+      .collection('larianseloka');
   List<Product> _products = [];
   bool _isLoading = true;
 
@@ -38,55 +63,26 @@ class _ProductListState extends State<ProductList> {
   Future<void> _fetchProducts() async {
     try {
       QuerySnapshot querySnapshot = await _collectionRef.get();
+
+      if (querySnapshot.docs.isEmpty) {
+        print('No products found in Firestore.');
+      }
+
       List<Product> fetchedProducts = querySnapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
+        print('Fetched product: $data');
         return Product(
-          name: data['name'] ?? '',
-          price: data['price'] ?? '',
+          name: data['name'] ?? 'No Name',
+          price: data['price'] ?? 'No Price',
           discountedPrice: data['discountedPrice'] ?? '',
           isDiscounted: data['isDiscounted'] ?? false,
           imagePath: data['imagePath'] ?? '',
-          description: data['description'] ?? '',
+          description: data['description'] ?? 'No Description',
         );
       }).toList();
 
-      final predefinedProducts = [
-        Product(
-          name: 'Larian Seloka',
-          price: 'RM50.00',
-          discountedPrice: '',
-          isDiscounted: false,
-          imagePath: 'assets/image/larianseloka.jpg',
-          description: 'Description for Larian Seloka.',
-        ),
-        Product(
-          name: 'Unbocs Run',
-          price: 'RM100.00',
-          discountedPrice: 'RM29.90',
-          isDiscounted: true,
-          imagePath: 'assets/image/unbocs.jpg',
-          description: 'Description for Unbocs Run.',
-        ),
-        Product(
-          name: 'Kelip-Kelip Run',
-          price: 'RM70.00',
-          discountedPrice: 'RM50.00',
-          isDiscounted: true,
-          imagePath: 'assets/image/Kelip2.jpeg',
-          description: 'Description for Kelip-Kelip Run.',
-        ),
-        Product(
-          name: 'Night Trail Run',
-          price: 'RM29.90',
-          discountedPrice: '',
-          isDiscounted: false,
-          imagePath: 'assets/image/night.jpg',
-          description: 'Description for Night Trail Run.',
-        ),
-      ];
-
       setState(() {
-        _products = fetchedProducts + predefinedProducts;
+        _products = fetchedProducts;
         _isLoading = false;
       });
     } catch (e) {
@@ -101,6 +97,15 @@ class _ProductListState extends State<ProductList> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_products.isEmpty) {
+      return const Center(
+        child: Text(
+          'No products available!',
+          style: TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+      );
     }
 
     return SingleChildScrollView(
@@ -143,10 +148,14 @@ class _ProductListState extends State<ProductList> {
                                 ? Image.network(
                                     product.imagePath,
                                     fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        const Icon(Icons.image_not_supported),
                                   )
                                 : Image.asset(
                                     product.imagePath,
                                     fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        const Icon(Icons.image_not_supported),
                                   ),
                           ),
                         ),
@@ -222,41 +231,18 @@ class ProductDetails extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () => _selectSize(context),
+            onPressed: () => _navigateToQR(context),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color.fromARGB(255, 119, 0, 50),
             ),
-            child: const Text('Buy'),
+            child: const Text('Buy Now'),
           ),
         ],
       ),
     );
   }
 
-  void _selectSize(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Select Size'),
-          content: const Text('Select size options here.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () => _navigateToQR(context),
-              child: const Text('Buy Now'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void _navigateToQR(BuildContext context) {
-    Navigator.pop(context); // Close the dialog
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const QRPage()),
@@ -280,8 +266,8 @@ class QRPage extends StatelessWidget {
           children: [
             Image.asset(
               'assets/image/qr.jpg',
-              width: 200,
-              height: 200,
+              width: 400,
+              height: 400,
               fit: BoxFit.cover,
             ),
             const SizedBox(height: 20),
@@ -299,12 +285,18 @@ class QRPage extends StatelessWidget {
   }
 
   void _uploadProof(BuildContext context) async {
-    FirebaseFirestore.instance.collection('payments').add({
-      'proof': 'uploaded_file_url', // Replace with actual file URL
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Payment proof uploaded successfully!')),
-    );
+    try {
+      await FirebaseFirestore.instance.collection('payments').add({
+        'proof': 'uploaded_file_url', // Replace with actual file URL
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Payment proof uploaded successfully!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error uploading proof: $e')),
+      );
+    }
   }
 }
 
