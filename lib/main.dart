@@ -3,21 +3,33 @@ import 'package:firebase_core/firebase_core.dart';
 //import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:utmrunify/loginpage.dart';
+
+import 'consts.dart';
 /*import 'package:image_picker/image_picker.dart';
 
 
 import 'package:utmrunify/userprofilepage.dart';
 import 'auth_service.dart';
 
+import 'consts.dart';
 import 'event_details.dart';
+import 'homepage.dart';
 import 'track_distance.dart';
 import 'shop.dart';*/
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Add this line
   await Firebase.initializeApp();
+  await _setup();
   runApp(const MyApp());
+}
+
+Future<void> _setup() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Stripe.publishableKey = stripePublishableKey;
 }
 
 class MyApp extends StatelessWidget {
@@ -48,12 +60,12 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
   final _auth = AuthService();
   static final List<Widget> _pages = <Widget>[
-    const HomePage(),
-    const NotificationPage(),
-    const FeedbackPage(),
-    const ShopPage(),
-    const ActivityPage(),
-    const ProfilePage(),
+    HomePage(),
+    NotificationPage(),
+    RecordPage(),
+    ShopPage(),  // Added ShopPage here
+    ActivityPage(),
+    ProfilePage(),
   ];
 
   void _onItemTapped(int index) {
