@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:utmrunify/loginpage.dart';
+
+import 'consts.dart';
 /*import 'package:image_picker/image_picker.dart';
 
 
