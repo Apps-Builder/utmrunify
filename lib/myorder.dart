@@ -70,60 +70,76 @@ class _MyOrderPageState extends State<MyOrderPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Orders'),
-        backgroundColor: const Color.fromARGB(255, 119, 0, 50),
-        titleTextStyle: const TextStyle(fontSize: 24, color: Colors.white),
-      ),
-      body: ListView.builder(
-        itemCount: _orders.length,
-        itemBuilder: (context, index) {
-          final order = _orders[index];
-          return Card(
-            elevation: 4,
-            margin: const EdgeInsets.all(8.0),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title and Divider on top
+            const Text(
+              'My Orders',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    order.name,
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 6),
-                  Text('Price: ${order.price}'),
-                  Text('Quantity: ${order.quantity}'),
-                  Text('Size: ${order.size}'),
-                  Text('Total Price: ${order.totalPrice}'),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Delivery Address:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(order.deliveryAddress),
-                  const SizedBox(height: 10),
-                  if (order.proof.isNotEmpty)
-                    Column(
-                      children: [
-                        const Text(
-                          'Payment Proof:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Image.network(order.proof),
-                      ],
+            const Divider(
+              color: Color.fromARGB(255, 119, 0, 50),
+              thickness: 3,
+            ),
+            // The ListView.builder with orders list
+            Expanded(
+              child: ListView.builder(
+                itemCount: _orders.length,
+                itemBuilder: (context, index) {
+                  final order = _orders[index];
+                  return Card(
+                    elevation: 4,
+                    margin: const EdgeInsets.all(8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                ],
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            order.name,
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 6),
+                          Text('Price: ${order.price}'),
+                          Text('Quantity: ${order.quantity}'),
+                          Text('Size: ${order.size}'),
+                          Text('Total Price: ${order.totalPrice}'),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Delivery Address:',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(order.deliveryAddress),
+                          const SizedBox(height: 10),
+                          if (order.proof.isNotEmpty)
+                            Column(
+                              children: [
+                                const Text(
+                                  'Payment Proof:',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Image.network(order.proof),
+                              ],
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
+
   }
 }
 

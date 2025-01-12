@@ -31,12 +31,6 @@ class ShopPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Shop'),
-        backgroundColor: const Color.fromARGB(255, 119, 0, 50),
-        titleTextStyle: const TextStyle(fontSize: 24, color: Colors.white),
-        leading: null,
-      ),
       body: const ProductList(),
     );
   }
@@ -118,6 +112,14 @@ class _ProductListState extends State<ProductList> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              'Shop',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const Divider(
+              color: Color.fromARGB(255, 119, 0, 50),
+              thickness: 3,
+            ),
             const Text(
               'Most Popular',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),

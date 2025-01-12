@@ -70,17 +70,22 @@ class _FeedbackPageState extends State<FeedbackPage> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Feedback'),
-        backgroundColor: const Color.fromARGB(255, 119, 0, 50),
-      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(screenWidth * 0.04), // Dynamic padding based on screen width
         child: Form(
           key: _formKey,
           child: Column(
+
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const Text(
+                'Feedback',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const Divider(
+                color: Color.fromARGB(255, 119, 0, 50),
+                thickness: 3,
+              ),
               Text(
                 'We value your feedback!',
                 style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.bold),
