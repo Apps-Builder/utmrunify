@@ -9,7 +9,6 @@ class ReviewFeedbackPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('User Feedback'),
-        backgroundColor: const Color.fromARGB(255, 119, 0, 50),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
