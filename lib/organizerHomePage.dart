@@ -1,26 +1,78 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:utmrunify/organiserprofilepage.dart';
 import 'addevent.dart';
+import 'auth_service.dart';
 import 'manageeventpage.dart';
 import 'editparticipant.dart';
 import 'reviewfeedback.dart';
 
-class OrganizerHomePage extends StatelessWidget {
+
+class OrganizerHomePage extends StatefulWidget {
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: HomePage(),
-    );
-  }
+  _OrganizerHomePageState createState() => _OrganizerHomePageState();
+
 }
 
-class HomePage extends StatelessWidget {
+class _OrganizerHomePageState extends State<OrganizerHomePage> {
+  final _auth = AuthService();
+  late String? organiserName;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserDetails();
+  }
+
+  Future<void> _getUserDetails() async {
+    try {
+      var userID = _auth.getUserID();
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(userID).get();
+
+      if (userDoc.exists) {
+        setState(() {
+          organiserName = userDoc.data()!['name'] ?? '';
+          isLoading = false; // Set loading to false after data is fetched
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User data not found.')),
+        );
+        setState(() {
+          isLoading = false; // Stop loading even if user data is missing
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to fetch user data: $e')),
+      );
+      setState(() {
+        isLoading = false; // Stop loading on error
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    if (isLoading) {
+      // Show loading indicator while waiting for organiserName
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Home"),
+        ),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
+        automaticallyImplyLeading: false, // Disable the back button
         actions: [
           IconButton(
             icon: Icon(Icons.person),
@@ -41,35 +93,8 @@ class HomePage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Running events',
+                  'Welcome back, ${organiserName}',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: Text('See More >'),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            height: 200,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                EventCard(
-                  date: 'OCT\n12',
-                  title: 'UNBOCS\' Run',
-                  image: 'assets/image/unbocs.jpg',
-                ),
-                EventCard(
-                  date: 'NOV\n23',
-                  title: 'KELIP-KELIP\' Run',
-                  image: 'assets/image/Kelip2.jpeg',
-                ),
-                EventCard(
-                  date: 'DEC\n21',
-                  title: 'SELOKA\' Run',
-                  image: 'assets/image/Seloka.jpeg',
                 ),
               ],
             ),
