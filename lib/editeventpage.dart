@@ -5,15 +5,20 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'auth_service.dart';
 import 'eventdetailpage.dart';
+import 'homepage.dart';
 
-class RegisterEventPage extends StatefulWidget {
+class EditEventPage extends StatefulWidget {
+
+  final String eventId;
+
+  const EditEventPage({super.key, required this.eventId});
+
   @override
-  _RegisterEventPageState createState() => _RegisterEventPageState();
+  _EditEventPageState createState() => _EditEventPageState();
 }
 
-class _RegisterEventPageState extends State<RegisterEventPage> {
+class _EditEventPageState extends State<EditEventPage> {
   final _formKey = GlobalKey<FormState>();
-  final _auth = AuthService();
   late final String fullName;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -32,6 +37,8 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
   final TextEditingController _racekitcollectionlocationController =
   TextEditingController();
 
+  late final List<Category> categories;
+
   // Controllers for category and entitlement
   final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _entitlementController = TextEditingController();
@@ -42,7 +49,7 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
   File? _selectedEventEntitlementImage;
   String? _imageUrl, _imageUrl2, _imageUrl3; // To store the uploaded image URL
   bool _agreedToTerms = false;
-  bool isLoading = false;
+
   bool _isShirtEntitlement = false; // To track if entitlement is a shirt
 
   final ImagePicker _picker = ImagePicker();
@@ -51,20 +58,41 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
   List<Map<String, dynamic>> _categories = [];
   List<Map<String, dynamic>> _currentEntitlements = [];
 
+  bool isLoading = true; // Loading state
+
   @override
   void initState() {
     super.initState();
-    _getUserDetails();
+    _getEventDetails();
   }
 
-  Future<void> _getUserDetails() async {
+  Future<void> _getEventDetails() async {
     try {
-      var userID = _auth.getUserID();
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(userID).get();
+      final eventDoc = await FirebaseFirestore.instance.collection('events').doc(widget.eventId).get();
 
-      if (userDoc.exists) {
+      final data = eventDoc.data() as Map<String, dynamic>;
+      var categoryList = (data['categories'] as List)
+          .map((categoryData) => categoryData as Map<String, dynamic>)
+          .toList();
+
+      if (eventDoc.exists) {
         setState(() {
-          fullName = userDoc.data()!['name'] ?? '';
+          _eventNameController.text = eventDoc.data()!['name'] ?? '';
+          _eventDescriptionController.text = eventDoc.data()!['description'] ?? '';
+          fullName = eventDoc.data()!['organiser'] ?? '';
+          _eventDateController.text = eventDoc.data()!['eventDate'] ?? '';
+          _eventTimeController.text = eventDoc.data()!['eventTime'] ?? '';
+          _registrationEndDateController.text = eventDoc.data()!['registrationEndDate'] ?? '';
+          _registrationEndTimeController.text = eventDoc.data()!['registrationEndTime'] ?? '';
+          _locationController.text = eventDoc.data()!['location'] ?? '';
+          _imageUrl = eventDoc.data()!['eventBannerUrl'] ?? '';
+          _imageUrl2 = eventDoc.data()!['eventEntitlementUrl'] ?? '';
+          _imageUrl3 = eventDoc.data()!['eventRouteMapUrl'] ?? '';
+          _racekitcollectiondateController.text = eventDoc.data()!['race_kit_collection_date'] ?? '';
+          _racekitcollectiontimeController.text = eventDoc.data()!['race_kit_collection_time'] ?? '';
+          _racekitcollectionlocationController.text = eventDoc.data()!['race_kit_collection_venue'] ?? '';
+          _categories = categoryList;
+          isLoading = false; // Data is loaded, set isLoading to false
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -81,18 +109,18 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
 
   @override
   Widget build(BuildContext context) {
+
     if (isLoading) {
       // Show loading indicator while waiting for data
       return Scaffold(
         appBar: AppBar(
-          title: Text('Register Event'),
+          title: Text('Edit Event'),
         ),
         body: Center(
           child: CircularProgressIndicator(), // Show loading indicator
         ),
       );
     }
-
 
     return Scaffold(
       appBar: AppBar(
@@ -102,7 +130,7 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
             Navigator.pop(context);
           },
         ),
-        title: Text('Register Event'),
+        title: Text('Edit Event'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -368,7 +396,7 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
                     );
                   },
                 ),
-              SizedBox(height: 16),
+                SizedBox(height: 16),
               ],
               SizedBox(height: 8),
               buildTextField('Price', '',
@@ -428,11 +456,12 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
                         ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: (category['entitlements'] as List<Map<String, dynamic>>)
-                              .map((entitlement) => Text(
+                          children: (category['entitlements'] as List<dynamic>?)
+                              ?.map((entitlement) => Text(
                             '• ${entitlement['name']} ${entitlement['isShirt'] ? '(Shirt)' : ''}',
                           ))
-                              .toList(),
+                              .toList() ??
+                              [],
                         ),
                       ],
                     ),
@@ -441,7 +470,7 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
               }).toList(),
 
 
-              _selectedEventBanner == null
+              _imageUrl == null
                   ? TextButton(
                 onPressed: () {_pickImage("Banner");},
                 style: TextButton.styleFrom(
@@ -454,14 +483,25 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
               )
                   : Column(
                 children: [
-                  Image.file(_selectedEventBanner!, height: 200, fit: BoxFit.scaleDown), // Adjust fit as needed),
+                  _selectedEventBanner != null
+                      ? Image.file(
+                    _selectedEventBanner!,
+                    height: 200,
+                    fit: BoxFit.scaleDown,
+                  )
+                      : Image.network(
+                    _imageUrl!, // URL of the image
+                    height: 200,
+                    fit: BoxFit.scaleDown,
+                    errorBuilder: (context, error, stackTrace) => Icon(Icons.error), // Handle errors
+                  ),
                   TextButton(
                     onPressed: () {_pickImage("Banner");},
                     child: Text('Change Event Banner'),
                   ),
                 ],
               ),
-              _selectedEventEntitlementImage == null
+              _imageUrl2 == null
                   ? TextButton(
                 onPressed: () {_pickImage("Entitlement");},
                 style: TextButton.styleFrom(
@@ -474,28 +514,50 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
               )
                   : Column(
                 children: [
-                  Image.file(_selectedEventEntitlementImage!, height: 200, fit: BoxFit.scaleDown),
+                  _selectedEventEntitlementImage != null
+                      ? Image.file(
+                    _selectedEventEntitlementImage!,
+                    height: 200,
+                    fit: BoxFit.scaleDown,
+                  )
+                      : Image.network(
+                    _imageUrl2!, // URL of the image
+                    height: 200,
+                    fit: BoxFit.scaleDown,
+                    errorBuilder: (context, error, stackTrace) => Icon(Icons.error), // Handle errors
+                  ),
                   TextButton(
                     onPressed: () {_pickImage("Entitlement");},
                     child: Text('Change Event Entitlement Image'),
                   ),
                 ],
               ),
-              _selectedEventRouteMapImage == null
-                ? TextButton(
-                    onPressed: () {_pickImage("Route Map");},
-                    style: TextButton.styleFrom(
-                    backgroundColor: Color(0xFF870C14), // Set the background color
-                    ),
-                    child: Text(
-                    'Upload Event Route Map',
-                    style: TextStyle(color: Colors.white), // Set the text color
-                    ),
-                    )
-                        : Column(
-                    children: [
-                    Image.file(_selectedEventRouteMapImage!, height: 200, fit: BoxFit.scaleDown),
-                    TextButton(
+              _imageUrl3 == null
+                  ? TextButton(
+                onPressed: () {_pickImage("Route Map");},
+                style: TextButton.styleFrom(
+                  backgroundColor: Color(0xFF870C14), // Set the background color
+                ),
+                child: Text(
+                  'Upload Event Route Map',
+                  style: TextStyle(color: Colors.white), // Set the text color
+                ),
+              )
+                  : Column(
+                children: [
+                  _selectedEventRouteMapImage != null
+                      ? Image.file(
+                    _selectedEventRouteMapImage!,
+                    height: 200,
+                    fit: BoxFit.scaleDown,
+                  )
+                      : Image.network(
+                    _imageUrl3!, // URL of the image
+                    height: 200,
+                    fit: BoxFit.scaleDown,
+                    errorBuilder: (context, error, stackTrace) => Icon(Icons.error), // Handle errors
+                  ),
+                  TextButton(
                     onPressed: () {_pickImage("Route Map");},
                     child: Text('Change Event Route Map'),
                   ),
@@ -542,11 +604,7 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
                     );
                   }
                 },
-                child: isLoading
-                    ? CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                )
-                    : Text('SUBMIT', style: TextStyle(color: Colors.white)),
+                child: Text('UPDATE', style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
@@ -609,7 +667,7 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
 
     try {
       // Create the event document in Firestore
-      DocumentReference docRef = await _firestore.collection('events').add({
+      await _firestore.collection('events').doc(widget.eventId).update({
         'name': _eventNameController.text.trim(),
         'organiser': fullName,
         'description': _eventDescriptionController.text.trim(),
@@ -627,45 +685,16 @@ class _RegisterEventPageState extends State<RegisterEventPage> {
         'categories': _categories, // Add categories (including price) to Firestore
       });
 
-      // Retrieve the document data after saving
-      DocumentSnapshot docSnapshot = await docRef.get();
-      final eventData = docSnapshot.data() as Map<String, dynamic>;
-
       // Navigate to the event details page
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Event Registered Successfully')),
+        SnackBar(content: Text('Event Updated Successfully')),
       );
 
-      _clearFormFields();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error saving event: $e')),
       );
     }
-  }
-
-  void _clearFormFields() {
-    _eventNameController.clear();
-    _locationController.clear();
-    _eventDescriptionController.clear();
-    _registrationEndDateController.clear();
-    _eventDateController.clear();
-    _eventTimeController.clear();
-    _registrationEndTimeController.clear();
-    _racekitcollectiondateController.clear();
-    _racekitcollectiontimeController.clear();
-    _racekitcollectionlocationController.clear();
-    _categoryController.clear();
-    _entitlementController.clear();
-    _priceController.clear();
-    setState(() {
-      _selectedEventBanner = null;
-      _selectedEventRouteMapImage = null;
-      _selectedEventEntitlementImage = null;
-      _imageUrl = null;
-      _categories = [];
-      _currentEntitlements = [];
-    });
   }
 
   Widget buildTextField(String label, String placeholder,

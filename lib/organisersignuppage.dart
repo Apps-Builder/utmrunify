@@ -162,7 +162,7 @@ class _OrganiserSignUpState extends State<OrganiserSignUpPage> {
                       ),
                       Expanded(
                         child: Text(
-                          "I have read and agreed to abide by the rules & regulations of the UNBOCS'24 RUN",
+                          "I have read and agreed to abide by the rules & regulations of UTM RUNIFY",
                           style: TextStyle(fontSize: 14),
                         ),
                       ),

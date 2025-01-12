@@ -3,33 +3,58 @@ import 'package:flutter/material.dart';
 
 import 'event_details.dart';
 
+class Entitlement {
+  final bool isShirt;
+  final String name;
+
+  Entitlement({
+    required this.isShirt,
+    required this.name,
+  });
+
+  // Factory method to create an Entitlement instance from a map
+  factory Entitlement.fromMap(Map<String, dynamic> map) {
+    return Entitlement(
+      isShirt: map['isShirt'] ?? false,
+      name: map['name'] ?? '',
+    );
+  }
+}
+
 class Category {
   final String name;
-  final List<String> entitlements;
-  final double price; // Change price to int
+  final List<Entitlement> entitlements; // Updated to use List of Entitlement
+  final double price;
 
   Category({
     required this.name,
     required this.entitlements,
-    required this.price, // Initialize price in constructor
+    required this.price,
   });
 
   // Factory method to create a Category instance from a map
   factory Category.fromMap(Map<String, dynamic> map) {
     return Category(
       name: map['name'] ?? '',
-      entitlements: List<String>.from(map['entitlements'] ?? []),
-      price: map['price'] != null ? double.tryParse(map['price'].toString()) ?? 0 : 0, // Parse price as int
+      entitlements: (map['entitlements'] as List<dynamic>? ?? [])
+          .map((e) => Entitlement.fromMap(e as Map<String, dynamic>))
+          .toList(),
+      price: map['price'] != null ? double.tryParse(map['price'].toString()) ?? 0 : 0,
     );
   }
 }
 
-
-
 class RunningEvent {
   final String name;
+  final String description;
   final String eventDate;
-  final String imageUrl;
+  final String eventTime;
+  final String organiser;
+  final String registrationEndDate;
+  final String registrationEndTime;
+  final String eventBannerUrl;
+  final String eventEntitlementUrl;
+  final String eventRouteMapUrl;
   final String location;
   final String raceKitCollectionDate;
   final String raceKitCollectionTime;
@@ -38,9 +63,16 @@ class RunningEvent {
 
   RunningEvent({
     required this.name,
+    required this.description,
+    required this.organiser,
     required this.eventDate,
+    required this.eventTime,
+    required this.registrationEndDate,
+    required this.registrationEndTime,
     required this.location,
-    required this.imageUrl,
+    required this.eventBannerUrl,
+    required this.eventEntitlementUrl,
+    required this.eventRouteMapUrl,
     required this.raceKitCollectionDate,
     required this.raceKitCollectionTime,
     required this.raceKitCollectionVenue,
@@ -56,9 +88,16 @@ class RunningEvent {
 
     return RunningEvent(
       name: data['name'] ?? '',
+      description: data['description'] ?? '',
+      organiser: data['organiser'] ?? '',
       eventDate: data['eventDate'] ?? '',
+      eventTime: data['eventTime'] ?? '',
+      registrationEndDate: data['registrationEndDate'] ?? '',
+      registrationEndTime: data['registrationEndTime'] ?? '',
       location: data['location'] ?? '',
-      imageUrl: data['imageUrl'] ?? '',
+      eventBannerUrl: data['eventBannerUrl'] ?? '',
+      eventEntitlementUrl: data['eventEntitlementUrl'] ?? '',
+      eventRouteMapUrl: data['eventRouteMapUrl'] ?? '',
       raceKitCollectionDate: data['race_kit_collection_date'] ?? '',
       raceKitCollectionTime: data['race_kit_collection_time'] ?? '',
       raceKitCollectionVenue: data['race_kit_collection_venue'] ?? '',
@@ -66,8 +105,6 @@ class RunningEvent {
     );
   }
 }
-
-
 
 class HomePage extends StatefulWidget {
   @override
@@ -93,6 +130,7 @@ class _HomePageState extends State<HomePage> {
 
     setState(() {
       runningEvents.addAll(events);
+      print(runningEvents);
     });
   }
 
@@ -134,7 +172,7 @@ class _HomePageState extends State<HomePage> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(5),
                                 child: Image.network(
-                                  event.imageUrl, // Assuming this is a valid image URL
+                                  event.eventBannerUrl, // Assuming this is a valid image URL
                                   fit: BoxFit.cover, // Ensures the image fills the container
                                   errorBuilder: (context, error, stackTrace) {
                                     return Container(
@@ -197,7 +235,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              Text(event.location),
+                              Text(event.organiser),
                               const SizedBox(height: 8),
                               ElevatedButton(
                                 onPressed: () {

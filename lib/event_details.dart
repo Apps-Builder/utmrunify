@@ -32,7 +32,7 @@ class EventDetailsPage extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 image: DecorationImage(
-                  image: NetworkImage(event.imageUrl),
+                  image: NetworkImage(event.eventBannerUrl),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -51,7 +51,7 @@ class EventDetailsPage extends StatelessWidget {
                 const Icon(Icons.calendar_today,
                     color: Color.fromARGB(255, 119, 0, 50)),
                 const SizedBox(width: 8),
-                Text(event.eventDate),
+                Text(event.eventDate + ' ' + event.eventTime),
               ],
             ),
             const SizedBox(height: 8),
@@ -61,6 +61,15 @@ class EventDetailsPage extends StatelessWidget {
                     color: Color.fromARGB(255, 119, 0, 50)),
                 const SizedBox(width: 8),
                 Text(event.location),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.people,
+                    color: Color.fromARGB(255, 119, 0, 50)),
+                const SizedBox(width: 8),
+                Text(event.organiser),
               ],
             ),
             const Divider(
@@ -74,7 +83,11 @@ class EventDetailsPage extends StatelessWidget {
                   color: Color.fromARGB(255, 119, 0, 50)),
             ),
             const SizedBox(height: 8),
-
+            Text(
+              event.description,
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 16),
             // Display categories and their entitlements
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,7 +100,7 @@ class EventDetailsPage extends StatelessWidget {
                       Text(
                         '${category.name}:',
                         style: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -95,7 +108,7 @@ class EventDetailsPage extends StatelessWidget {
                       ...List.generate(
                         category.entitlements.length,
                             (index) => Text(
-                          '${index + 1}. ${category.entitlements[index]}',
+                          '${index + 1}. ${category.entitlements[index].name}',
                           style: const TextStyle(fontSize: 16),
                         ),
                       ),
@@ -108,22 +121,80 @@ class EventDetailsPage extends StatelessWidget {
                 height: 32,
                 color: Color.fromARGB(255, 119, 0, 50),
                 thickness: 3),
+            if (event.raceKitCollectionDate != null && event.raceKitCollectionDate.isNotEmpty)
+              ...[
+                const Text(
+                  'RACE KIT COLLECTION',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 119, 0, 50),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Date: ${event.raceKitCollectionDate}\n'
+                      'Time: ${event.raceKitCollectionTime}\n'
+                      'Venue: ${event.raceKitCollectionVenue}\n',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
             const Text(
-              'RACE KIT COLLECTION',
+              'REGISTRATION END TIME',
               style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 119, 0, 50)),
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 119, 0, 50),
+              ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Date: ${event.raceKitCollectionDate}\n'
-                  'Time: ${event.raceKitCollectionTime}\n'
-                  'Venue: ${event.raceKitCollectionVenue}\n',
+              'Date: ${event.registrationEndDate}\n'
+                  'Time: ${event.registrationEndTime}\n',
               style: const TextStyle(fontSize: 16),
             ),
+            if (event.eventEntitlementUrl != null && event.eventEntitlementUrl.isNotEmpty)
+              ...[
+                const Text(
+                  'ENTITLEMENT',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 119, 0, 50),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    image: DecorationImage(
+                      image: NetworkImage(event.eventEntitlementUrl),
+                      fit: BoxFit.scaleDown,
+                    ),
+                  ),
+                ),
+              ],
+            if (event.eventRouteMapUrl != null && event.eventRouteMapUrl.isNotEmpty)
+              ...[
+                const SizedBox(height: 8),
+                const Text(
+                  'ROUTE MAP',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 119, 0, 50),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    image: DecorationImage(
+                      image: NetworkImage(event.eventRouteMapUrl),
+                      fit: BoxFit.scaleDown,
+                    ),
+                  ),
+                ),
+              ],
             const SizedBox(height: 24),
-
-            // Sign Up Button
             Center(
               child: ElevatedButton(
                 onPressed: () {

@@ -38,17 +38,6 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(widget.selectedEvent.name),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            tooltip: 'Cart',
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Cart functionality coming soon!')),
-              );
-            },
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -70,9 +59,6 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
                     setState(() {
                       selectedCategoryName = category.name;
                     });
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('${category.name} selected')),
-                    );
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
@@ -103,45 +89,52 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
             ),
             const SizedBox(height: 8),
             // Display entitlements based on the selected category
-            ...entitlements.asMap().entries.map((entry) {
-              int index = entry.key; // This is the index of the item
-              String item = entry.value; // This is the item itself
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Text(
-                  '${index + 1}. $item', // Add the index number and the item
-                  style: const TextStyle(fontSize: 16),
-                ),
-              );
-            }).toList(),
-
-            const SizedBox(height: 16),
-            DropdownButton<String>(
-              value: selectedSize,
-              items: <String>['Size', 'XS', 'S', 'M', 'L', 'XL', 'XXL']
-                  .map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Row(
+            if (selectedCategoryName.isNotEmpty)
+              ...entitlements.asMap().entries.map((entry) {
+                int index = entry.key; // This is the index of the item
+                Entitlement entitlement = entry.value; // This is the Entitlement object itself
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.checkroom),
-                      const SizedBox(width: 8.0),
-                      Text(value),
+                      Text(
+                        '${index + 1}. ${entitlement.name}', // Display index, name, and isShirt status
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      if (entitlement.isShirt) // Check if entitlement is a shirt
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: DropdownButton<String>(
+                            value: selectedSize,
+                            items: <String>['Size', 'XS', 'S', 'M', 'L', 'XL', 'XXL']
+                                .map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.checkroom),
+                                    const SizedBox(width: 8.0),
+                                    Text(value),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedSize = newValue!;
+                              });
+                            },
+                            style: const TextStyle(fontSize: 16, color: Colors.black),
+                            isExpanded: true,
+                          ),
+                        ),
                     ],
                   ),
                 );
               }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedSize = newValue!;
-                });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Selected size: $selectedSize')),
-                );
-              },
-              style: const TextStyle(fontSize: 16, color: Colors.black),
-              isExpanded: true,
-            ),
+
+            const SizedBox(height: 16),
             const Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -160,6 +153,7 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
                             ParticipantFormPage(
                               category: selectedCategory,
                               selectedEvent: widget.selectedEvent,
+                              selectedShirtSize: selectedSize
                             ),
                         transitionsBuilder:
                             (context, animation, secondaryAnimation, child) {
@@ -184,6 +178,7 @@ class _RunSelectionPageState extends State<RunSelectionPage> {
                     backgroundColor: const Color.fromARGB(255, 119, 0, 50),
                     padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      foregroundColor: Colors.white
                   ),
                   child: const Text('SUBMIT'),
                 ),

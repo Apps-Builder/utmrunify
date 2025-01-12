@@ -9,8 +9,9 @@ import 'homepage.dart';
 class ParticipantFormPage extends StatefulWidget {
   final Category category;
   final RunningEvent selectedEvent;
+  final String selectedShirtSize;
 
-  const ParticipantFormPage({super.key, required this.category, required this.selectedEvent});
+  const ParticipantFormPage({super.key, required this.category, required this.selectedEvent, required this.selectedShirtSize});
 
   @override
   _ParticipantFormPageState createState() => _ParticipantFormPageState();
@@ -80,8 +81,6 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
       medicalConditionsController.clear();
       selectedNationality = '';
       gender = '';
-      selectedResidentialCountry = '';
-      selectedResidentialState = '';
     });
   }
 
@@ -103,23 +102,10 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
     'A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-', 'I don\'t know'
   ];
 
-  List<String> residentialCountries = [
-    'Malaysia', 'Singapore', 'Indonesia', 'Thailand',
-    'United States', 'Canada', 'Germany', 'Australia', 'India', 'China', 'Japan',
-  ]; // Add more countries for residential options
-
-  List<String> residentialStates = []; // This will be updated based on selected residential country
-
-  // Add new variables for Residential Country and State
-  String selectedResidentialCountry = '';
-  String selectedResidentialState = '';
-
   @override
   void initState() {
     super.initState();
     _getUserDetails();
-    selectedResidentialCountry = residentialCountries[0]; // Set a default country
-    _updateResidentialStates(selectedResidentialCountry); // Update states based on default country
   }
 
   Future<void> _getUserDetails() async {
@@ -131,16 +117,25 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
         setState(() {
           fullName = userDoc.data()!['name'] ?? '';
           contactNumber = userDoc.data()!['contactno'] ?? '';
+          setState(() {
+            isLoading = false; // Stop loading on error
+          });
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('User data not found.')),
         );
+        setState(() {
+          isLoading = false; // Stop loading on error
+        });
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to fetch user data: $e')),
       );
+      setState(() {
+        isLoading = false; // Stop loading on error
+      });
     }
   }
 
@@ -166,20 +161,6 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
         SnackBar(content: Text('Failed to fetch user data: $e')),
       );
     }
-  }
-
-  // Update residential state based on selected residential country
-  void _updateResidentialStates(String country) {
-    if (country == 'Malaysia') {
-      setState(() {
-        residentialStates = ['Johor', 'Kuala Lumpur', 'Penang', 'Selangor', 'Perak']; // Example states
-      });
-    } else if (country == 'Singapore') {
-      setState(() {
-        residentialStates = ['Central', 'Eastern', 'Northern', 'Western', 'Southern'];
-      });
-    }
-    // Add more countries and their states if needed
   }
 
   @override
@@ -217,6 +198,19 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    if (isLoading) {
+      // Show loading indicator while waiting for organiserName
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(widget.selectedEvent.name),
+        ),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -247,11 +241,19 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
                 const Divider(color: Color.fromARGB(255, 119, 0, 50), thickness: 2),
                 ...List.generate(
                   widget.category.entitlements.length,
-                      (index) => Text(
-                    '${index + 1}. ${widget.category.entitlements[index]}',
-                    style: const TextStyle(fontSize: 16),
-                  ),
+                      (index) {
+                    String entitlementName = widget.category.entitlements[index].name;
+                    // Add '(Shirt)' if entitlement is a shirt
+                    if (widget.category.entitlements[index].isShirt) {
+                      entitlementName += ' (Chosen Size: ${widget.selectedShirtSize})';
+                    }
+                    return Text(
+                      '${index + 1}. $entitlementName',
+                      style: const TextStyle(fontSize: 16),
+                    );
+                  },
                 ),
+
                 Text("", style: const TextStyle(fontSize: 16)),
                 const Text(
                   'Participant Details',
@@ -354,25 +356,6 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
                 const SizedBox(height: 8),
                 _buildTextField('Email Address*', (value) => emailController.text = value, controller: emailController, keyboardType: TextInputType.emailAddress),
                 const SizedBox(height: 8),
-                // Add Residential Country Dropdown
-                _buildDropdownField(
-                  'Residential Country*',
-                  residentialCountries,
-                      (value) {
-                    setState(() {
-                      selectedResidentialCountry = value!;
-                      _updateResidentialStates(selectedResidentialCountry); // Update states based on selected country
-                    });
-                  },
-                ),
-                const SizedBox(height: 8),
-                // Add Residential State Dropdown
-                _buildDropdownField(
-                  'State*',
-                  residentialStates,
-                      (value) => selectedResidentialState = value!,
-                ),
-                const SizedBox(height: 8),
                 _buildTextField(
                   'Emergency Contact Name*',
                       (value) => emergencyContactNameController.text = value,
@@ -429,7 +412,13 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
                         : () async {
                       if (_formKey.currentState!.validate() && isAgreed) {
                           if (await StripeService.instance.makePayment(widget.category.price.toInt())) {
+                            setState(() {
+                              isLoading = true; // Start loading
+                            });
                             uploadInfoToDb();
+                            setState(() {
+                              isLoading = false;
+                            });
                             ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text('Payment success. Registration success.'))
                             );
@@ -451,6 +440,7 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 119, 0, 50),
                       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                        foregroundColor: Colors.white
                     ),
                     child: isLoading
                         ? const CircularProgressIndicator(
@@ -511,10 +501,13 @@ class _ParticipantFormPageState extends State<ParticipantFormPage> {
       FirebaseFirestore.instance.collection("registration").doc().set({
         "userID": userID,
         "eventName": widget.selectedEvent.name,
+        "eventCategory": widget.category.name,
+        "shirtSize": widget.selectedShirtSize,
         "email": emailController.text.trim(),
         "contactno": contactNumberController.text.trim(),
         "dateofbirth": dobController.text.trim(),
-        "gender": gender,  // Assuming _selectedGender is a variable you have in your code
+        "nationality": selectedNationality,
+        "gender": gender,
         "name": fullNameController.text.trim(),
         "passportNo": passportNoController.text.trim(),
         "address": addressController.text.trim(),
