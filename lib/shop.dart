@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -78,7 +81,7 @@ class _ProductListState extends State<ProductList> {
           isDiscounted: data['isDiscounted'] ?? false,
           imagePath: data['imagePath'] ?? '',
           description: data['description'] ?? 'No Description',
-          isSock: data['isSock'] ?? false, // Assuming a field to indicate socks
+          isSock: data['isSock'] ?? false,
         );
       }).toList();
 
@@ -220,84 +223,127 @@ class ProductDetails extends StatefulWidget {
 class _ProductDetailsState extends State<ProductDetails> {
   String _selectedSize = 'M'; // Default size
   int _quantity = 1; // Default quantity
+  final TextEditingController _addressController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
+  XFile? _selectedFile; // Holds the selected file
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            widget.product.name,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            widget.product.description,
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 20),
-          if (!widget.product.isSock) ...[
+    return SingleChildScrollView( // Add this to make the content scrollable
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              widget.product.name,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              widget.product.description,
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            if (!widget.product.isSock) ...[
+              const Text(
+                'Select Size:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              DropdownButton<String>(
+                value: _selectedSize,
+                onChanged: (String? newSize) {
+                  setState(() {
+                    _selectedSize = newSize!;
+                  });
+                },
+                items: ['S', 'M', 'L', 'XL', 'XXL']
+                    .map((size) => DropdownMenuItem(value: size, child: Text(size)))
+                    .toList(),
+              ),
+              const SizedBox(height: 20),
+            ],
             const Text(
-              'Select Size:',
+              'Select Quantity:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            DropdownButton<String>(
-              value: _selectedSize,
-              onChanged: (String? newSize) {
-                setState(() {
-                  _selectedSize = newSize!;
-                });
-              },
-              items: ['S', 'M', 'L', 'XL', 'XXL']
-                  .map((size) => DropdownMenuItem(value: size, child: Text(size)))
-                  .toList(),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.remove),
+                  onPressed: _quantity > 1
+                      ? () {
+                          setState(() {
+                            _quantity--;
+                          });
+                        }
+                      : null,
+                ),
+                Text('$_quantity', style: const TextStyle(fontSize: 16)),
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () {
+                    setState(() {
+                      _quantity++;
+                    });
+                  },
+                ),
+              ],
             ),
             const SizedBox(height: 20),
-          ],
-          const Text(
-            'Select Quantity:',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.remove),
-                onPressed: _quantity > 1
-                    ? () {
-                        setState(() {
-                          _quantity--;
-                        });
-                      }
-                    : null,
-              ),
-              Text('$_quantity', style: const TextStyle(fontSize: 16)),
-              IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () {
-                  setState(() {
-                    _quantity++;
-                  });
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () => _navigateToQR(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromARGB(255, 119, 0, 50),
-              textStyle: const TextStyle(color: Colors.white)
+            const Text(
+              'Enter Delivery Address:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            child: const Text('Buy Now'),
-          ),
-        ],
+            const SizedBox(height: 10),
+            TextField(
+              controller: _addressController,
+              decoration: const InputDecoration(
+                labelText: 'Delivery Address',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Upload Proof of Payment:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _pickFile,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 119, 0, 50),
+                textStyle: const TextStyle(color: Colors.white),
+              ),
+              child: const Text('Pick File'),
+            ),
+            if (_selectedFile != null) ...[
+              Text('Selected File: ${_selectedFile!.name}'),
+            ],
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => _navigateToQR(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 119, 0, 50),
+                textStyle: const TextStyle(color: Colors.white),
+              ),
+              child: const Text('Proceed to Payment'),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  void _pickFile() async {
+    final XFile? file = await _picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _selectedFile = file;
+    });
   }
 
   void _navigateToQR(BuildContext context) {
@@ -308,31 +354,104 @@ class _ProductDetailsState extends State<ProductDetails> {
           selectedSize: _selectedSize,
           quantity: _quantity,
           product: widget.product, // Pass the product here
+          deliveryAddress: _addressController.text, // Pass the address
+          selectedFile: _selectedFile, // Pass the selected file
         ),
       ),
     );
   }
 }
 
-class QRPage extends StatelessWidget {
+class QRPage extends StatefulWidget {
   final String selectedSize;
   final int quantity;
   final Product product;
+  final String deliveryAddress;
+  final XFile? selectedFile; // Add this to hold the file
 
   const QRPage({
     super.key,
     required this.selectedSize,
     required this.quantity,
     required this.product,
+    required this.deliveryAddress,
+    required this.selectedFile, // Receive file here
   });
 
+  @override
+  _QRPageState createState() => _QRPageState();
+}
+
+class _QRPageState extends State<QRPage> {
   double _calculateTotalPrice() {
-    double price = double.tryParse(product.price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
-    if (product.isDiscounted) {
-      double discountedPrice = double.tryParse(product.discountedPrice.replaceAll(RegExp(r'[^0-9.]'), '')) ?? price;
-      return discountedPrice * quantity;
+    double price = double.tryParse(widget.product.price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
+    if (widget.product.isDiscounted) {
+      double discountedPrice = double.tryParse(widget.product.discountedPrice.replaceAll(RegExp(r'[^0-9.]'), '')) ?? price;
+      return discountedPrice * widget.quantity;
     }
-    return price * quantity;
+    return price * widget.quantity;
+  }
+
+  Future<void> _uploadProof(BuildContext context) async {
+    try {
+      // Remove the file check to always proceed with the upload
+      if (widget.selectedFile != null) {
+        // Convert XFile to File
+        final file = File(widget.selectedFile!.path);
+
+        // Upload the file to Firebase Storage
+        FirebaseStorage storage = FirebaseStorage.instance;
+        Reference ref = storage.ref().child('paymentProofs/${widget.selectedFile!.name}');
+        UploadTask uploadTask = ref.putFile(file);
+
+        // Get the URL of the uploaded file
+        String fileURL = await (await uploadTask).ref.getDownloadURL();
+
+        // Save payment data to Firestore
+        var paymentData = {
+          'quantity': widget.quantity,
+          'price': widget.product.price,
+          'totalPrice': _calculateTotalPrice(),
+          'proof': fileURL, // Store the file URL
+          'address': widget.deliveryAddress,
+          'name': widget.product.name,
+        };
+
+        if (!widget.product.isSock) {
+          paymentData['size'] = widget.selectedSize;
+        }
+
+        await FirebaseFirestore.instance.collection('payments').add(paymentData);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Payment proof uploaded successfully!')),
+        );
+      } else {
+        // Proceed without file if no file is selected (force success)
+        var paymentData = {
+          'quantity': widget.quantity,
+          'price': widget.product.price,
+          'totalPrice': _calculateTotalPrice(),
+          'proof': '', // If no file selected, store an empty proof
+          'address': widget.deliveryAddress,
+          'name': widget.product.name,
+        };
+
+        if (!widget.product.isSock) {
+          paymentData['size'] = widget.selectedSize;
+        }
+
+        await FirebaseFirestore.instance.collection('payments').add(paymentData);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Payment information saved successfully')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error uploading proof: $e')),
+      );
+    }
   }
 
   @override
@@ -341,66 +460,48 @@ class QRPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Upload Payment Proof'),
+        title: const Text('Order Summary'),
         backgroundColor: const Color.fromARGB(255, 119, 0, 50),
         titleTextStyle: const TextStyle(fontSize: 24, color: Colors.white),
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset(
-              'assets/image/qr.jpg',
-              width: 400,
-              height: 400,
-              fit: BoxFit.cover,
+            const Text(
+              'Order Summary',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            Text(
-              'Total Price: RM${totalPrice.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text('Product: ${widget.product.name}'),
+            Text('Quantity: ${widget.quantity}'),
+            if (widget.product.isDiscounted)
+              Text('Discounted Price: ${widget.product.discountedPrice}'),
+            Text('Total Price: $totalPrice'),
+            const SizedBox(height: 20),
+            const Text(
+              'QR Code for Payment',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
+            const SizedBox(height: 10),
+            Image.asset('assets/image/qr.jpg'), // Display the QR image here
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => _uploadProof(context),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 119, 0, 50),
+                textStyle: const TextStyle(color: Colors.white),
               ),
-              child: const Text('Upload Proof of Payment'),
+              child: const Text('Upload Payment Proof'),
             ),
           ],
         ),
       ),
     );
   }
-
-  void _uploadProof(BuildContext context) async {
-    try {
-      // Create the payment document
-      var paymentData = {
-        'quantity': quantity,
-        'price': product.price,
-        'totalPrice': _calculateTotalPrice(),
-        'proof': 'uploaded_file_url', // Replace with actual file URL or path
-      };
-
-      // Only add size if the product is not a sock
-      if (!product.isSock) {
-        paymentData['size'] = selectedSize;
-      }
-
-      await FirebaseFirestore.instance.collection('payments').add(paymentData);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Payment proof uploaded successfully!')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error uploading proof: $e')),
-      );
-    }
-  }
 }
+
 
 class Product {
   final String name;
@@ -409,7 +510,7 @@ class Product {
   final bool isDiscounted;
   final String imagePath;
   final String description;
-  final bool isSock; // Add field to determine if it's a sock
+  final bool isSock;
 
   Product({
     required this.name,
