@@ -78,6 +78,7 @@ class _ProductListState extends State<ProductList> {
           isDiscounted: data['isDiscounted'] ?? false,
           imagePath: data['imagePath'] ?? '',
           description: data['description'] ?? 'No Description',
+          isSock: data['isSock'] ?? false, // Assuming a field to indicate socks
         );
       }).toList();
 
@@ -207,10 +208,18 @@ class _ProductListState extends State<ProductList> {
   }
 }
 
-class ProductDetails extends StatelessWidget {
+class ProductDetails extends StatefulWidget {
   final Product product;
 
   const ProductDetails({super.key, required this.product});
+
+  @override
+  _ProductDetailsState createState() => _ProductDetailsState();
+}
+
+class _ProductDetailsState extends State<ProductDetails> {
+  String _selectedSize = 'M'; // Default size
+  int _quantity = 1; // Default quantity
 
   @override
   Widget build(BuildContext context) {
@@ -221,19 +230,68 @@ class ProductDetails extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            product.name,
+            widget.product.name,
             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
           Text(
-            product.description,
+            widget.product.description,
             style: const TextStyle(fontSize: 16),
+          ),
+          const SizedBox(height: 20),
+          if (!widget.product.isSock) ...[
+            const Text(
+              'Select Size:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            DropdownButton<String>(
+              value: _selectedSize,
+              onChanged: (String? newSize) {
+                setState(() {
+                  _selectedSize = newSize!;
+                });
+              },
+              items: ['S', 'M', 'L', 'XL', 'XXL']
+                  .map((size) => DropdownMenuItem(value: size, child: Text(size)))
+                  .toList(),
+            ),
+            const SizedBox(height: 20),
+          ],
+          const Text(
+            'Select Quantity:',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.remove),
+                onPressed: _quantity > 1
+                    ? () {
+                        setState(() {
+                          _quantity--;
+                        });
+                      }
+                    : null,
+              ),
+              Text('$_quantity', style: const TextStyle(fontSize: 16)),
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  setState(() {
+                    _quantity++;
+                  });
+                },
+              ),
+            ],
           ),
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () => _navigateToQR(context),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color.fromARGB(255, 119, 0, 50),
+              textStyle: const TextStyle(color: Colors.white)
             ),
             child: const Text('Buy Now'),
           ),
@@ -245,20 +303,47 @@ class ProductDetails extends StatelessWidget {
   void _navigateToQR(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const QRPage()),
+      MaterialPageRoute(
+        builder: (context) => QRPage(
+          selectedSize: _selectedSize,
+          quantity: _quantity,
+          product: widget.product, // Pass the product here
+        ),
+      ),
     );
   }
 }
 
 class QRPage extends StatelessWidget {
-  const QRPage({super.key});
+  final String selectedSize;
+  final int quantity;
+  final Product product;
+
+  const QRPage({
+    super.key,
+    required this.selectedSize,
+    required this.quantity,
+    required this.product,
+  });
+
+  double _calculateTotalPrice() {
+    double price = double.tryParse(product.price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
+    if (product.isDiscounted) {
+      double discountedPrice = double.tryParse(product.discountedPrice.replaceAll(RegExp(r'[^0-9.]'), '')) ?? price;
+      return discountedPrice * quantity;
+    }
+    return price * quantity;
+  }
 
   @override
   Widget build(BuildContext context) {
+    double totalPrice = _calculateTotalPrice();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Upload Payment Proof'),
         backgroundColor: const Color.fromARGB(255, 119, 0, 50),
+        titleTextStyle: const TextStyle(fontSize: 24, color: Colors.white),
       ),
       body: Center(
         child: Column(
@@ -269,6 +354,11 @@ class QRPage extends StatelessWidget {
               width: 400,
               height: 400,
               fit: BoxFit.cover,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Total Price: RM${totalPrice.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -286,9 +376,21 @@ class QRPage extends StatelessWidget {
 
   void _uploadProof(BuildContext context) async {
     try {
-      await FirebaseFirestore.instance.collection('payments').add({
-        'proof': 'uploaded_file_url', // Replace with actual file URL
-      });
+      // Create the payment document
+      var paymentData = {
+        'quantity': quantity,
+        'price': product.price,
+        'totalPrice': _calculateTotalPrice(),
+        'proof': 'uploaded_file_url', // Replace with actual file URL or path
+      };
+
+      // Only add size if the product is not a sock
+      if (!product.isSock) {
+        paymentData['size'] = selectedSize;
+      }
+
+      await FirebaseFirestore.instance.collection('payments').add(paymentData);
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Payment proof uploaded successfully!')),
       );
@@ -307,6 +409,7 @@ class Product {
   final bool isDiscounted;
   final String imagePath;
   final String description;
+  final bool isSock; // Add field to determine if it's a sock
 
   Product({
     required this.name,
@@ -315,5 +418,6 @@ class Product {
     required this.isDiscounted,
     required this.imagePath,
     required this.description,
+    required this.isSock,
   });
 }
