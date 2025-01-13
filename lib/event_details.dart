@@ -4,7 +4,6 @@ import 'registerevent.dart';
 import 'userhomepage.dart';
 import 'homepage.dart';
 import 'main.dart';
-import 'registerevent.dart';
 
 class EventDetailsPage extends StatelessWidget {
   final RunningEvent event;
