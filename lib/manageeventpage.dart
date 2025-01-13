@@ -13,7 +13,7 @@ class _ManageEventPageState extends State<ManageEventPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final _auth = AuthService();
   late String organiserName;
-  bool isLoading = true; // Loading state
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -29,14 +29,14 @@ class _ManageEventPageState extends State<ManageEventPage> {
       if (userDoc.exists) {
         setState(() {
           organiserName = userDoc.data()!['name'] ?? '';
-          isLoading = false; // Set loading to false after data is fetched
+          isLoading = false; 
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('User data not found.')),
         );
         setState(() {
-          isLoading = false; // Stop loading even if user data is missing
+          isLoading = false;
         });
       }
     } catch (e) {
@@ -44,7 +44,7 @@ class _ManageEventPageState extends State<ManageEventPage> {
         SnackBar(content: Text('Failed to fetch user data: $e')),
       );
       setState(() {
-        isLoading = false; // Stop loading on error
+        isLoading = false; 
       });
     }
   }
@@ -52,7 +52,7 @@ class _ManageEventPageState extends State<ManageEventPage> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      // Show loading indicator while waiting for organiserName
+      
       return Scaffold(
         appBar: AppBar(
           title: Text('Manage Events'),
@@ -150,7 +150,6 @@ class _ManageEventPageState extends State<ManageEventPage> {
   }
 
   void _editEvent(String eventId) {
-    // Navigate to an event editing page or show a dialog to edit the event
     Navigator.push(
       context,
       MaterialPageRoute(

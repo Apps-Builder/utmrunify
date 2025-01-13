@@ -34,14 +34,14 @@ class _OrganizerHomePageState extends State<OrganizerHomePage> {
       if (userDoc.exists) {
         setState(() {
           organiserName = userDoc.data()!['name'] ?? '';
-          isLoading = false; // Set loading to false after data is fetched
+          isLoading = false; 
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('User data not found.')),
         );
         setState(() {
-          isLoading = false; // Stop loading even if user data is missing
+          isLoading = false; 
         });
       }
     } catch (e) {
@@ -49,7 +49,7 @@ class _OrganizerHomePageState extends State<OrganizerHomePage> {
         SnackBar(content: Text('Failed to fetch user data: $e')),
       );
       setState(() {
-        isLoading = false; // Stop loading on error
+        isLoading = false; 
       });
     }
   }
@@ -58,7 +58,7 @@ class _OrganizerHomePageState extends State<OrganizerHomePage> {
   Widget build(BuildContext context) {
 
     if (isLoading) {
-      // Show loading indicator while waiting for organiserName
+      
       return Scaffold(
         appBar: AppBar(
           title: Text("Home"),
@@ -72,7 +72,7 @@ class _OrganizerHomePageState extends State<OrganizerHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
-        automaticallyImplyLeading: false, // Disable the back button
+        automaticallyImplyLeading: false, 
         actions: [
           IconButton(
             icon: Icon(Icons.person),

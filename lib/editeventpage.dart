@@ -22,7 +22,7 @@ class _EditEventPageState extends State<EditEventPage> {
   late final String fullName;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Controllers to manage user input
+  
   final TextEditingController _eventNameController = TextEditingController();
   final TextEditingController _eventDescriptionController = TextEditingController();
   final TextEditingController _eventTimeController = TextEditingController();
@@ -39,26 +39,25 @@ class _EditEventPageState extends State<EditEventPage> {
 
   late final List<Category> categories;
 
-  // Controllers for category and entitlement
+  
   final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _entitlementController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController(); // Controller for price
+  final TextEditingController _priceController = TextEditingController(); 
 
-  File? _selectedEventBanner; // To store the picked image
+  File? _selectedEventBanner; 
   File? _selectedEventRouteMapImage;
   File? _selectedEventEntitlementImage;
-  String? _imageUrl, _imageUrl2, _imageUrl3; // To store the uploaded image URL
+  String? _imageUrl, _imageUrl2, _imageUrl3;
   bool _agreedToTerms = false;
 
-  bool _isShirtEntitlement = false; // To track if entitlement is a shirt
+  bool _isShirtEntitlement = false; 
 
   final ImagePicker _picker = ImagePicker();
 
-  // Store categories and their entitlements
   List<Map<String, dynamic>> _categories = [];
   List<Map<String, dynamic>> _currentEntitlements = [];
 
-  bool isLoading = true; // Loading state
+  bool isLoading = true; 
 
   @override
   void initState() {
@@ -92,7 +91,7 @@ class _EditEventPageState extends State<EditEventPage> {
           _racekitcollectiontimeController.text = eventDoc.data()!['race_kit_collection_time'] ?? '';
           _racekitcollectionlocationController.text = eventDoc.data()!['race_kit_collection_venue'] ?? '';
           _categories = categoryList;
-          isLoading = false; // Data is loaded, set isLoading to false
+          isLoading = false; 
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -111,13 +110,13 @@ class _EditEventPageState extends State<EditEventPage> {
   Widget build(BuildContext context) {
 
     if (isLoading) {
-      // Show loading indicator while waiting for data
+      
       return Scaffold(
         appBar: AppBar(
           title: Text('Edit Event'),
         ),
         body: Center(
-          child: CircularProgressIndicator(), // Show loading indicator
+          child: CircularProgressIndicator(),
         ),
       );
     }
@@ -170,27 +169,27 @@ class _EditEventPageState extends State<EditEventPage> {
               ),
               SizedBox(height: 16),
               TextFormField(
-                controller: _eventTimeController, // This name can be updated to suit your needs
+                controller: _eventTimeController, 
                 decoration: InputDecoration(
-                  labelText: 'Time*', // Label should reflect that it's for time input
-                  suffixIcon: Icon(Icons.access_time), // Use a clock icon for time
+                  labelText: 'Time*',
+                  suffixIcon: Icon(Icons.access_time), 
                 ),
-                readOnly: true, // Make it read-only to trigger the picker on tap
+                readOnly: true,
                 onTap: () async {
                   TimeOfDay? pickedTime = await showTimePicker(
                     context: context,
-                    initialTime: TimeOfDay.now(), // Set initial time to the current time
+                    initialTime: TimeOfDay.now(), 
                   );
                   if (pickedTime != null) {
                     setState(() {
-                      // Convert the picked time to string format (e.g., "HH:mm AM/PM")
+                      
                       _eventTimeController.text = pickedTime.format(context);
                     });
                   }
                 },
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Time is required'; // Validation for empty time field
+                    return 'Time is required'; 
                   }
                   return null;
                 },
@@ -225,27 +224,27 @@ class _EditEventPageState extends State<EditEventPage> {
               ),
               SizedBox(height: 16),
               TextFormField(
-                controller: _registrationEndTimeController, // This name can be updated to suit your needs
+                controller: _registrationEndTimeController, 
                 decoration: InputDecoration(
-                  labelText: 'Registration End Time*', // Label should reflect that it's for time input
-                  suffixIcon: Icon(Icons.access_time), // Use a clock icon for time
+                  labelText: 'Registration End Time*', 
+                  suffixIcon: Icon(Icons.access_time), 
                 ),
-                readOnly: true, // Make it read-only to trigger the picker on tap
+                readOnly: true, 
                 onTap: () async {
                   TimeOfDay? pickedTime = await showTimePicker(
                     context: context,
-                    initialTime: TimeOfDay.now(), // Set initial time to the current time
+                    initialTime: TimeOfDay.now(), 
                   );
                   if (pickedTime != null) {
                     setState(() {
-                      // Convert the picked time to string format (e.g., "HH:mm AM/PM")
+                      
                       _registrationEndTimeController.text = pickedTime.format(context);
                     });
                   }
                 },
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Registration End Time is required'; // Validation for empty time field
+                    return 'Registration End Time is required';
                   }
                   return null;
                 },
@@ -260,8 +259,8 @@ class _EditEventPageState extends State<EditEventPage> {
                   labelText: 'Description*',
                   hintText: 'Enter event description',
                 ),
-                maxLines: null,  // Allow multiple lines
-                keyboardType: TextInputType.multiline,  // Set the keyboard type to multiline
+                maxLines: null,  
+                keyboardType: TextInputType.multiline,  
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Description is required';
@@ -293,20 +292,20 @@ class _EditEventPageState extends State<EditEventPage> {
               ),
               SizedBox(height: 16),
               TextFormField(
-                controller: _racekitcollectiontimeController, // This name can be updated to suit your needs
+                controller: _racekitcollectiontimeController, 
                 decoration: InputDecoration(
-                  labelText: 'Race Kit Collection Time', // Label should reflect that it's for time input
-                  suffixIcon: Icon(Icons.access_time), // Use a clock icon for time
+                  labelText: 'Race Kit Collection Time', 
+                  suffixIcon: Icon(Icons.access_time), 
                 ),
-                readOnly: true, // Make it read-only to trigger the picker on tap
+                readOnly: true, 
                 onTap: () async {
                   TimeOfDay? pickedTime = await showTimePicker(
                     context: context,
-                    initialTime: TimeOfDay.now(), // Set initial time to the current time
+                    initialTime: TimeOfDay.now(),
                   );
                   if (pickedTime != null) {
                     setState(() {
-                      // Convert the picked time to string format (e.g., "HH:mm AM/PM")
+                      
                       _racekitcollectiontimeController.text = pickedTime.format(context);
                     });
                   }
@@ -318,7 +317,7 @@ class _EditEventPageState extends State<EditEventPage> {
                   controller: _racekitcollectionlocationController),
               SizedBox(height: 16),
 
-              // Category and entitlement input
+              
               buildTextField('Category', '',
                   controller: _categoryController),
               SizedBox(height: 8),
@@ -328,7 +327,7 @@ class _EditEventPageState extends State<EditEventPage> {
                     child: buildTextField('Entitlement', '',
                         controller: _entitlementController),
                   ),
-                  SizedBox(width: 8), // Add some spacing between the text field and the checkbox
+                  SizedBox(width: 8), 
                   Column(
                     children: [
                       Checkbox(
@@ -339,7 +338,7 @@ class _EditEventPageState extends State<EditEventPage> {
                           });
                         },
                       ),
-                      Text('Shirt'), // Optional: Label the checkbox for better clarity
+                      Text('Shirt'), 
                     ],
                   ),
                 ],
@@ -351,11 +350,11 @@ class _EditEventPageState extends State<EditEventPage> {
                     setState(() {
                       _currentEntitlements.add({
                         'name': _entitlementController.text,
-                        'isShirt': _isShirtEntitlement, // Add the shirt status
+                        'isShirt': _isShirtEntitlement,
                       });
                     });
                     _entitlementController.clear();
-                    _isShirtEntitlement = false; // Reset the shirt checkbox
+                    _isShirtEntitlement = false; 
                   }
                 },
                 child: Text('Add Entitlement'),
@@ -363,7 +362,7 @@ class _EditEventPageState extends State<EditEventPage> {
               SizedBox(height: 16),
 
 
-              // Display current entitlements for the category
+              
               if (_currentEntitlements.isNotEmpty) ...[
                 Text(
                   'Entitlements for "${_categoryController.text}":',
@@ -409,11 +408,11 @@ class _EditEventPageState extends State<EditEventPage> {
                     setState(() {
                       _categories.add({
                         'name': _categoryController.text,
-                        'entitlements': List<Map<String, dynamic>>.from(_currentEntitlements), // Copy the list of maps
-                        'price': double.tryParse(_priceController.text) ?? 0.0, // Store price
+                        'entitlements': List<Map<String, dynamic>>.from(_currentEntitlements), 
+                        'price': double.tryParse(_priceController.text) ?? 0.0, 
                       });
                       _categoryController.clear();
-                      _priceController.clear(); // Clear the price input after adding the category
+                      _priceController.clear(); 
                       _currentEntitlements.clear();
                     });
                   }
@@ -474,11 +473,11 @@ class _EditEventPageState extends State<EditEventPage> {
                   ? TextButton(
                 onPressed: () {_pickImage("Banner");},
                 style: TextButton.styleFrom(
-                  backgroundColor: Color(0xFF870C14), // Set the background color
+                  backgroundColor: Color(0xFF870C14),
                 ),
                 child: Text(
                   'Upload Event Banner',
-                  style: TextStyle(color: Colors.white), // Set the text color
+                  style: TextStyle(color: Colors.white),
                 ),
               )
                   : Column(
@@ -490,10 +489,10 @@ class _EditEventPageState extends State<EditEventPage> {
                     fit: BoxFit.scaleDown,
                   )
                       : Image.network(
-                    _imageUrl!, // URL of the image
+                    _imageUrl!, 
                     height: 200,
                     fit: BoxFit.scaleDown,
-                    errorBuilder: (context, error, stackTrace) => Icon(Icons.error), // Handle errors
+                    errorBuilder: (context, error, stackTrace) => Icon(Icons.error), 
                   ),
                   TextButton(
                     onPressed: () {_pickImage("Banner");},
@@ -505,11 +504,11 @@ class _EditEventPageState extends State<EditEventPage> {
                   ? TextButton(
                 onPressed: () {_pickImage("Entitlement");},
                 style: TextButton.styleFrom(
-                  backgroundColor: Color(0xFF870C14), // Set the background color
+                  backgroundColor: Color(0xFF870C14), 
                 ),
                 child: Text(
                   'Upload Event Entitlement Image',
-                  style: TextStyle(color: Colors.white), // Set the text color
+                  style: TextStyle(color: Colors.white), 
                 ),
               )
                   : Column(
@@ -521,10 +520,10 @@ class _EditEventPageState extends State<EditEventPage> {
                     fit: BoxFit.scaleDown,
                   )
                       : Image.network(
-                    _imageUrl2!, // URL of the image
+                    _imageUrl2!, 
                     height: 200,
                     fit: BoxFit.scaleDown,
-                    errorBuilder: (context, error, stackTrace) => Icon(Icons.error), // Handle errors
+                    errorBuilder: (context, error, stackTrace) => Icon(Icons.error), 
                   ),
                   TextButton(
                     onPressed: () {_pickImage("Entitlement");},
@@ -536,11 +535,11 @@ class _EditEventPageState extends State<EditEventPage> {
                   ? TextButton(
                 onPressed: () {_pickImage("Route Map");},
                 style: TextButton.styleFrom(
-                  backgroundColor: Color(0xFF870C14), // Set the background color
+                  backgroundColor: Color(0xFF870C14), 
                 ),
                 child: Text(
                   'Upload Event Route Map',
-                  style: TextStyle(color: Colors.white), // Set the text color
+                  style: TextStyle(color: Colors.white), 
                 ),
               )
                   : Column(
@@ -552,10 +551,10 @@ class _EditEventPageState extends State<EditEventPage> {
                     fit: BoxFit.scaleDown,
                   )
                       : Image.network(
-                    _imageUrl3!, // URL of the image
+                    _imageUrl3!, 
                     height: 200,
                     fit: BoxFit.scaleDown,
-                    errorBuilder: (context, error, stackTrace) => Icon(Icons.error), // Handle errors
+                    errorBuilder: (context, error, stackTrace) => Icon(Icons.error), 
                   ),
                   TextButton(
                     onPressed: () {_pickImage("Route Map");},
@@ -592,11 +591,11 @@ class _EditEventPageState extends State<EditEventPage> {
                 onPressed: () async {
                   if (_formKey.currentState!.validate() && _agreedToTerms) {
                     setState(() {
-                      isLoading = true; // Start loading
+                      isLoading = true; 
                     });
                     await saveEventToFirestore();
                     setState(() {
-                      isLoading = false; // Stop loading after upload
+                      isLoading = false;
                     });
                   } else if (!_agreedToTerms) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -666,7 +665,7 @@ class _EditEventPageState extends State<EditEventPage> {
     }
 
     try {
-      // Create the event document in Firestore
+   
       await _firestore.collection('events').doc(widget.eventId).update({
         'name': _eventNameController.text.trim(),
         'organiser': fullName,
@@ -682,10 +681,10 @@ class _EditEventPageState extends State<EditEventPage> {
         'race_kit_collection_date': _racekitcollectiondateController.text.trim(),
         'race_kit_collection_time': _racekitcollectiontimeController.text.trim(),
         'race_kit_collection_venue': _racekitcollectionlocationController.text.trim(),
-        'categories': _categories, // Add categories (including price) to Firestore
+        'categories': _categories, 
       });
 
-      // Navigate to the event details page
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Event Updated Successfully')),
       );

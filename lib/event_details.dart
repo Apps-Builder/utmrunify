@@ -87,7 +87,7 @@ class EventDetailsPage extends StatelessWidget {
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 16),
-            // Display categories and their entitlements
+           
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: event.categories.map<Widget>((category) {
